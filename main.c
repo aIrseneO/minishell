@@ -6,19 +6,21 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/19 23:10:00 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/22 01:40:36 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free_exit.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c libft.a
+//gw ft_error_free.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c libft.a ft_utils1.c
 
 int					main(int ac, char **av, char **env)
 {
 	int				n;
+	int				wstatus;
 	pid_t			father;
 	t_cmd			cmds;
+
 
 	(void)ac; (void)av;
 	if (signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR ||
@@ -31,27 +33,47 @@ int					main(int ac, char **av, char **env)
 				(n = get_next_line(0, &cmds.line)) == -1)
 			return (ft_perror(strerror(errno), &cmds));
 		if (!n && !(*cmds.line))
-			ft_free_and_exit(&cmds);
+			sigexit_ctrl_d_handler(&cmds);
 		if (ft_parse_input(&cmds) == -1)
 			return (ft_perror(strerror(errno), &cmds));
 		n = 0;
-		while (cmds.line1[n++])
+		while (cmds.line1 && cmds.line1[n++])
 		{
 			if (cmds.do_fork)
 			{
 				if ((father = fork()) == -1)
 					return (ft_perror(strerror(errno), &cmds));
-				if (father > 0 && wait(NULL) == -1)
+				if (father > 0)
 				{
-					kill(SIGQUIT, father);
-					return (ft_perror(strerror(errno), &cmds));
+					wait(&wstatus);
+					if (WIFEXITED(wstatus))
+					{
+						TEST1
+						cmds.status = WEXITSTATUS(wstatus);
+					}
+					if (WIFSIGNALED(wstatus))
+					{
+						TEST2
+						if (WTERMSIG(wstatus) == SIGINT)
+							cmds.status = 130;
+						if (WTERMSIG(wstatus) == SIGQUIT)
+							cmds.status = 131;
+					}
+					TEST3
+					ft_printf("%d\n", cmds.status);
+					//TEST1
+					//ft_printf("%d\n", cmds.wstatus);
+					//kill(SIGQUIT, father);
+					//return (ft_perror(strerror(errno), &cmds));
 				}
-				else if (father == 0)
+				if (father == 0)
 					ft_execvp(cmds.line); //ft_execute_cmds(cmds.line, envp);
-			}
+							}
 			else
 				write(1, "Change\n", 8); // ft_run(cmd)////////////////
 		}
+		//for(int i = 0; i < 5; i++)
+		//	ft_printf("%s\n", cmds.envp[i]);
 		ft_free_t_cmd(&cmds);
 		ft_init_t_cmd(&cmds);
 	}
