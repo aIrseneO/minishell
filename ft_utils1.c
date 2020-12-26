@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 18:11:48 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/21 22:40:35 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 00:39:03 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ char				*ft_getcwd(void)
 	return (ft_strdup(buf));
 }
 
-char				**ft_strinit(int size)
+char				**ft_astrinit(int size)
 {
 	char			**str;
 
@@ -34,7 +34,7 @@ char				**ft_strinit(int size)
 	return (str);
 }
 
-void				ft_strfree(char ***str)
+void				ft_astrfree(char ***str)
 {
 	int				i;
 
@@ -47,7 +47,7 @@ void				ft_strfree(char ***str)
 	*str = NULL;
 }
 
-void				ft_strnfree(char ***str, int n)
+void				ft_astrnfree(char ***str, int n)
 {
 	if (!str || !(*str))
 		return ;

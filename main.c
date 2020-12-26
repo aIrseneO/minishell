@@ -6,13 +6,17 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/22 01:40:36 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 01:25:46 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c libft.a ft_utils1.c
+//gw ft_error_free.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_envp_utils.c libft.a
+void					ft_prompt(void)
+{
+	write(1, "\x1B[32mMinishell $> \x1B[0m", 22);
+}
 
 int					main(int ac, char **av, char **env)
 {
@@ -27,10 +31,10 @@ int					main(int ac, char **av, char **env)
 			signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR ||
 			ft_init(&cmds, env) == -1)
 		return (ft_perror(strerror(errno), NULL));
+	ft_prompt();
 	while (1)
 	{
-		if (write(1, "\x1B[32mMinishell $> \x1B[0m", 22) == -1 ||
-				(n = get_next_line(0, &cmds.line)) == -1)
+		if ((n = get_next_line(0, &cmds.line)) == -1)
 			return (ft_perror(strerror(errno), &cmds));
 		if (!n && !(*cmds.line))
 			sigexit_ctrl_d_handler(&cmds);
@@ -39,41 +43,40 @@ int					main(int ac, char **av, char **env)
 		n = 0;
 		while (cmds.line1 && cmds.line1[n++])
 		{
-			if (cmds.do_fork)
+			////////////////////////
+			if (!cmds.do_fork)//////////////TODO change cmds.do_fork[n]
+			{
+				write(1, "Change\n", 8); // TODO change ft_run(cmd)
+				ft_prompt();
+			}
+			else
 			{
 				if ((father = fork()) == -1)
 					return (ft_perror(strerror(errno), &cmds));
-				if (father > 0)
-				{
-					wait(&wstatus);
-					if (WIFEXITED(wstatus))
-					{
-						TEST1
-						cmds.status = WEXITSTATUS(wstatus);
-					}
-					if (WIFSIGNALED(wstatus))
-					{
-						TEST2
-						if (WTERMSIG(wstatus) == SIGINT)
-							cmds.status = 130;
-						if (WTERMSIG(wstatus) == SIGQUIT)
-							cmds.status = 131;
-					}
-					TEST3
-					ft_printf("%d\n", cmds.status);
-					//TEST1
-					//ft_printf("%d\n", cmds.wstatus);
-					//kill(SIGQUIT, father);
-					//return (ft_perror(strerror(errno), &cmds));
-				}
 				if (father == 0)
-					ft_execvp(cmds.line); //ft_execute_cmds(cmds.line, envp);
-							}
-			else
-				write(1, "Change\n", 8); // ft_run(cmd)////////////////
+					ft_execvp(cmds.line); //TODO ft_execute_cmds(cmds.line, envp);
+				if (wait(&wstatus) == -1)
+					return (ft_perror(strerror(errno), &cmds));
+				if (WIFEXITED(wstatus))
+				{
+					ft_prompt();
+					cmds.status = WEXITSTATUS(wstatus);
+				}
+				else if (WIFSIGNALED(wstatus))
+				{
+					if (WTERMSIG(wstatus) == SIGINT)
+						cmds.status = 130;
+					else if (WTERMSIG(wstatus) == SIGQUIT)
+						cmds.status = 131;
+					if (WCOREDUMP(wstatus))
+					{
+						write(1, "Quit (core dumped)\n", 20);
+						ft_prompt();
+					}
+				}
+			}
+			ft_astrfree(&cmds.line2);///////////////
 		}
-		//for(int i = 0; i < 5; i++)
-		//	ft_printf("%s\n", cmds.envp[i]);
 		ft_free_t_cmd(&cmds);
 		ft_init_t_cmd(&cmds);
 	}

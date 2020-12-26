@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:42:48 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/22 01:40:32 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/22 20:17:57 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,14 @@ void	ft_execvp(char *line)
 
 void		sigint_ctrl_c_handler(int signum)
 {
-	int		wstatus;
-
+	write(1, "\n", 2);
+	ft_prompt();
 	(void)signum;
-	if (wait(&wstatus) == -1)
-		write(1, "\n\x1B[32mMinishell $> \x1B[0m", 23);
-	else if (WIFSIGNALED(wstatus))
-	{
-		////////////////////////cleanup
-		write(1, "\n", 2);
-	}
 }
 
 void		sigquit_ctrl_slash_handler(int signum)
 {
-	int		wstatus;
-
 	(void)signum;
-	if (wait(&wstatus) != -1 && WIFSIGNALED(wstatus) && WCOREDUMP(wstatus))
-		write(1, "Quit (core dumped)\n", 20);
 }
 
 void		sigexit_ctrl_d_handler(t_cmd *cmds)

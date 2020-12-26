@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:17:44 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/21 22:24:40 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 00:29:11 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ int			ft_perror(char *_errmsg, t_cmd *cmds)
 
 void		ft_free_t_cmd(t_cmd *cmds)
 {
+	ft_envpclear(&cmds->envp, ft_astrfree);
 	free(cmds->line);
-	ft_strfree(&cmds->envp);
-	ft_strfree(&cmds->line1);
-	ft_strfree(&cmds->line2);
-	//ft_strfree(cmds->);
-	//ft_strfree(cmds->);
+	ft_astrfree(&cmds->line1);
+	ft_astrfree(&cmds->line2);
+	//ft_astrfree(cmds->);
+	//ft_astrfree(cmds->);
 }
