@@ -6,25 +6,20 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 20:53:17 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 00:31:35 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 19:03:34 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			ft_parse_input(t_cmd *cmds)
+int			ft_parse_cmd(t_cmd *cmds, int i)
 {
-	int		n;
-
-	cmds->line1 = (char **)malloc(sizeof(char *) * 2);
-	cmds->line1[0] = ft_strdup("mouf\n");
-	cmds->line1[1] = NULL;
-	(void)cmds;
-	return (1);
-	if ((cmds->line1 = ft_split(cmds->line, ';')) == NULL)
+	if ((cmds->line2 = ft_split(cmds->line1[i], '|')) == NULL)
 		return (-1);
-	n = 0;
-	while (cmds->line1[n])
-		n++;
-	
+
+	//ft_printf("--->%s\n", cmds->line1[i]);
+
+	cmds->do_fork = 1;
+
+	return (1);
 }

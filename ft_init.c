@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 12:21:22 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 01:18:19 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 16:35:13 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ static int	ft_load_envp(char **env, t_envp **envp)
  		if ((!ft_strncmp(*env, "USER=", 5) && !(user = ft_envpnew(*env))) ||
 				(!ft_strncmp(*env, "HOME=", 5) && !(home = ft_envpnew(*env))))
 		{
-			ft_envpdelone(&user, ft_astrfree);
-			ft_envpdelone(&home, ft_astrfree);
+			ft_envpdelone(user, ft_astrfree);
+			ft_envpdelone(home, ft_astrfree);
 			return (-1);
 		}
 		env++;
@@ -79,8 +79,8 @@ static int	ft_load_envp(char **env, t_envp **envp)
 	if ((!user && !(user = ft_envpnew(USER))) ||
 		(!home && !(home = ft_envpnew(HOME))) || !(*envp = ft_envpnew("?=0")))
 	{
-		ft_envpdelone(&user, ft_astrfree);
-		ft_envpdelone(&home, ft_astrfree);
+		ft_envpdelone(user, ft_astrfree);
+		ft_envpdelone(home, ft_astrfree);
 		return (-1);
 	}
 	(*envp)->next = user;

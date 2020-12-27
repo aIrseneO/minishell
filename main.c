@@ -6,13 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 01:25:46 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 22:32:38 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_envp_utils.c libft.a
+//gw ft_error_free.c ft_parse_input.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_envp_utils.c ft_execute.c libft.a
 void					ft_prompt(void)
 {
 	write(1, "\x1B[32mMinishell $> \x1B[0m", 22);
@@ -38,12 +38,15 @@ int					main(int ac, char **av, char **env)
 			return (ft_perror(strerror(errno), &cmds));
 		if (!n && !(*cmds.line))
 			sigexit_ctrl_d_handler(&cmds);
-		if (ft_parse_input(&cmds) == -1)
+		if ((cmds.line1 = ft_split(cmds.line, ';')) == NULL)
 			return (ft_perror(strerror(errno), &cmds));
 		n = 0;
-		while (cmds.line1 && cmds.line1[n++])
+		if (!cmds.line1[0])
+			ft_prompt();
+		while (cmds.line1[n])
 		{
-			////////////////////////
+			if (ft_parse_cmd(&cmds, n++) == -1)
+				return (ft_perror(strerror(errno), &cmds));
 			if (!cmds.do_fork)//////////////TODO change cmds.do_fork[n]
 			{
 				write(1, "Change\n", 8); // TODO change ft_run(cmd)
@@ -54,13 +57,15 @@ int					main(int ac, char **av, char **env)
 				if ((father = fork()) == -1)
 					return (ft_perror(strerror(errno), &cmds));
 				if (father == 0)
-					ft_execvp(cmds.line); //TODO ft_execute_cmds(cmds.line, envp);
+					ft_execute_recursive_pipe(&cmds, STDIN_FILENO, 0);
 				if (wait(&wstatus) == -1)
 					return (ft_perror(strerror(errno), &cmds));
 				if (WIFEXITED(wstatus))
 				{
-					ft_prompt();
-					cmds.status = WEXITSTATUS(wstatus);
+					if ((cmds.status = WEXITSTATUS(wstatus)) == -1)
+						write(1, "\x1B[31mFailled\x1B[0m\n", 17);
+					if (!cmds.line1[n])
+						ft_prompt();
 				}
 				else if (WIFSIGNALED(wstatus))
 				{

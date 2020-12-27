@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 21:37:19 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 01:17:55 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/26 16:30:35 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,15 +65,11 @@ void		ft_envpclear(t_envp **envp, void (*del)(char ***))
 	}
 }
 
-void		ft_envpdelone(t_envp **envp, void (*del)(char ***))
+void		ft_envpdelone(t_envp *envp, void (*del)(char ***))
 {
-	t_envp	*tmp;
-
-	if (!(*envp))
+	if (!envp)
 		return ;
-	tmp = (*envp)->next;
-	free((*envp)->key);
-	del(&(*envp)->values);
-	free(*envp);
-	*envp = tmp;
+	free(envp->key);
+	del(&envp->values);
+	free(envp);
 }
