@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 22:31:16 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/28 00:42:00 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,15 @@
 ** line:		line1[0] [[;] line1[1] [;] line1[2] [;] ...]
 ** line1[i]:	line2[0] [[|] line2[1] [|] line2[2] [|] ...]
 */
+
+typedef struct			s_cmd
+{
+	char				*app;
+	t_list				*args;
+	t_list				*redirections;
+	t_list				*files;
+}							t_cmd;
+
 typedef struct			s_envp
 {
 	char				*key;
@@ -47,41 +56,45 @@ typedef struct			s_envp
 	struct s_envp		*next;
 }						t_envp;
 
-typedef struct			s_cmd
+typedef struct			s_data
 {
 	t_envp		*envp;
 	char		*line;
 	char		**line1;
 	char		**line2;
-
-	int			do_fork;
+	t_cmd		*scmd;
 	int			status;
-}						t_cmd;
+}						t_data;
 
 void	ft_prompt();
 
-int		ft_perror(char *_errmsg, t_cmd *cmds);
-void	ft_free_t_cmd(t_cmd *cmds);
+int		ft_perror(char *_errmsg, t_data *data);
+void	ft_free_t_data(t_data *data);
 
-void	ft_execute_recursive_pipe(t_cmd *cmds, int fd, int i);
+void	ft_execute_recursive_pipe(t_data *data, int fd, int i);
 
 void	sigint_ctrl_c_handler(int signum);
 void	sigquit_ctrl_slash_handler(int signum);
-void	sigexit_ctrl_d_handler(t_cmd *cmds);
+void	sigexit_ctrl_d_handler(t_data *data);
 
-int		ft_init(t_cmd *cmds, char **env);
-void	ft_init_t_cmd(t_cmd *cmds);
+int		ft_init(t_data *data, char **env);
+void	ft_init_t_data(t_data *data);
+int		ft_init_scmd(t_cmd **scmd, int n);
 
 char	**ft_astrinit(int size);
 void	ft_astrfree(char ***str);
 void	ft_astrnfree(char ***str, int n);
 char	*ft_getcwd(void);
 
-int		ft_parse_cmd(t_cmd *cmds, int i);
+int		ft_parse_cmds(t_data *data, int i);
 
 t_envp	*ft_envpnew(char *content);
 void	ft_envpadd_back(t_envp **envp, t_envp *nw);
 void	ft_envpclear(t_envp **envp, void (*del)(char ***));
 void	ft_envpdelone(t_envp *envp, void (*del)(char ***));
+
+int		ft_isfathercmd(char *cmd);
+int		ft_isredirection(char c);
+t_list	*ft_new_list(char *begin, char *end);
 
 #endif

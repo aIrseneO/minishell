@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_signal_handler.c                                :+:      :+:    :+:   */
+/*   ft_init_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/19 18:42:48 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/27 13:55:25 by atemfack         ###   ########.fr       */
+/*   Created: 2020/12/28 00:27:43 by atemfack          #+#    #+#             */
+/*   Updated: 2020/12/28 00:38:38 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void		sigint_ctrl_c_handler(int signum)
+int			ft_init_scmd(t_cmd **scmd, int n)
 {
-	write(1, "\n", 2);
-	ft_prompt();
-	(void)signum;
-}
-
-void		sigquit_ctrl_slash_handler(int signum)
-{
-	(void)signum;
-}
-
-void		sigexit_ctrl_d_handler(t_data *data)
-{
-	ft_free_t_data(data);
-	write(1, "\n", 2);
-	exit(0);
+	if ((*scmd = (t_cmd *)malloc(sizeof(**scmd) * n)) == NULL)
+		return (-1);
+	while (--n >= 0)
+	{
+		(*scmd)[n].app = NULL;
+		(*scmd)[n].args = NULL;
+		(*scmd)[n].redirections = NULL;
+		(*scmd)[n].files = NULL;
+	}
+	return (1);
 }

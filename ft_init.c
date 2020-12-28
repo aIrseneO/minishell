@@ -12,12 +12,12 @@
 
 #include "minishell.h"
 
-void		ft_init_t_cmd(t_cmd *cmds)
+void		ft_init_t_data(t_data *data)
 {
-	cmds->line = NULL;
-	cmds->line1 = NULL;
-	cmds->line2 = NULL;
-	//cmds-> = NULL;
+	data->line = NULL;
+	data->line1 = NULL;
+	data->line2 = NULL;
+	//data-> = NULL;
 }
 
 static int	ft_load_path_envp(char *tmp1, t_envp *envp)
@@ -87,11 +87,11 @@ static int	ft_load_envp(char **env, t_envp **envp)
 	return (ft_load_pwd_envp(user->next = home));
 }
 
-int			ft_init(t_cmd *cmds, char **env)
+int			ft_init(t_data *data, char **env)
 {
-	ft_init_t_cmd(cmds);
-	cmds->envp = NULL;
-	if (ft_load_envp(env, &cmds->envp) == -1)
-		return (ft_perror(strerror(errno), cmds));
+	ft_init_t_data(data);
+	data->envp = NULL;
+	if (ft_load_envp(env, &data->envp) == -1)
+		return (ft_perror(strerror(errno), data));
 	return (1);
 }

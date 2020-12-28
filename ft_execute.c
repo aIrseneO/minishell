@@ -21,17 +21,17 @@ static void		ft_execvp(char *line)
 	write(1, "Oops, something went wrong!\n", 28);
 }
 
-void		ft_execute_recursive_pipe(t_cmd *cmds, int fd, int i)
+void		ft_execute_recursive_pipe(t_data *data, int fd, int i)
 {
 	int				pipefd[2];
 	pid_t			father;
 
-	if (!cmds->line2[i + 1])
+	if (!data->line2[i + 1])
 	{
 		if ((fd != STDIN_FILENO) && ((dup2(fd, STDIN_FILENO) == -1
 					|| close(fd) == -1)))
 			exit(-1);
-		ft_execvp(cmds->line2[i]);
+		ft_execvp(data->line2[i]);
 	}
 	if ((pipe(pipefd) == -1 || (father = fork()) == -1))
 		exit(-1);
@@ -41,9 +41,9 @@ void		ft_execute_recursive_pipe(t_cmd *cmds, int fd, int i)
 				|| dup2(pipefd[1], STDOUT_FILENO) == -1 ||
 				close(pipefd[1]) == -1 || close(fd) == -1)
 			exit(-1);
-		ft_execvp(cmds->line2[i]);
+		ft_execvp(data->line2[i]);
 	}
 	if (wait(NULL) == -1 || close(pipefd[1]) == -1)
 		exit(-1);
-	ft_execute_recursive_pipe(cmds, pipefd[0], i + 1);
+	ft_execute_recursive_pipe(data, pipefd[0], i + 1);
 }

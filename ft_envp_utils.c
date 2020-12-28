@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/25 21:37:19 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 16:30:35 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/28 01:17:38 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ t_envp		*ft_envpnew(char *content)
 		free(envp);
 		return (NULL);
 	}
-	ft_strlcpy(envp->key, content, n);
+	ft_strlcpy(envp->key, content, n + 1);
 	envp->key[n] = '\0';
 	envp->next = NULL;
 	return (envp);

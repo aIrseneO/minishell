@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int			ft_perror(char *_errmsg, t_cmd *cmds)
+int			ft_perror(char *_errmsg, t_data *data)
 {
 	if (_errmsg)
 	{
@@ -20,17 +20,17 @@ int			ft_perror(char *_errmsg, t_cmd *cmds)
 		write(1, _errmsg, ft_strlen(_errmsg));
 		write(1, RESET, 4);
 	}
-	if (cmds)
-		ft_free_t_cmd(cmds);
+	if (data)
+		ft_free_t_data(data);
 	return (errno);
 }
 
-void		ft_free_t_cmd(t_cmd *cmds)
+void		ft_free_t_data(t_data *data)
 {
-	ft_envpclear(&cmds->envp, ft_astrfree);
-	free(cmds->line);
-	ft_astrfree(&cmds->line1);
-	ft_astrfree(&cmds->line2);
-	//ft_astrfree(cmds->);
-	//ft_astrfree(cmds->);
+	ft_envpclear(&data->envp, ft_astrfree);
+	free(data->line);
+	ft_astrfree(&data->line1);
+	ft_astrfree(&data->line2);
+	//ft_astrfree(data->);
+	//ft_astrfree(data->);
 }
