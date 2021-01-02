@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/28 00:42:00 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/02 00:45:37 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,25 +20,36 @@
 # include <sys/time.h>
 # include <sys/resource.h>
 # include <errno.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <dirent.h>
+
 # include "libft.h"
 
 # include <string.h>
 
 # define RED		"\x1B[31m"
 # define GRN		"\x1B[32m"
+# define YEL		"\x1B[33m"
+# define BLU		"\x1B[34m"
+# define MAG		"\x1B[35m"
+# define CYN		"\x1B[36m"
+# define WHT		"\x1B[37m"
 # define RESET		"\x1B[0m"
 # define PATH_MAX	4096
 # define USER		"USER=user42"
 # define HOME		"HOME=/home/user42"
+# define PROMPT		write(1, "\x1B[32mMinishell_> \x1B[0m", 21)
 
 #define TEST1 write(1, "test1\n", 7); //////
 #define TEST2 write(1, "test2\n", 7); //////
 #define TEST3 write(1, "test3\n", 7); //////
 
 /*
-** Formats:
-** line:		line1[0] [[;] line1[1] [;] line1[2] [;] ...]
-** line1[i]:	line2[0] [[|] line2[1] [|] line2[2] [|] ...]
+** Formats layour:
+** line1:	line1[0]                             ; line1[1]   ...    ; line1[[n]
+** line2:	line2[0] | line2[1] | ... | line2[n] ;
+** cmd:		{cmd[0] ,  cmd[1] , ... ,  cmd[n]}
 */
 
 typedef struct			s_cmd
@@ -47,53 +58,49 @@ typedef struct			s_cmd
 	t_list				*args;
 	t_list				*redirections;
 	t_list				*files;
+	char				**argv;
 }							t_cmd;
-
-typedef struct			s_envp
-{
-	char				*key;
-	char				**values;
-	struct s_envp		*next;
-}						t_envp;
 
 typedef struct			s_data
 {
-	t_envp		*envp;
+	char		*pwd;
 	char		*line;
 	char		**line1;
 	char		**line2;
-	t_cmd		*scmd;
+	char		**envp;
+	char		**path; /////
+	t_cmd		**cmd;
 	int			status;
 }						t_data;
 
-void	ft_prompt();
-
 int		ft_perror(char *_errmsg, t_data *data);
 void	ft_free_t_data(t_data *data);
+void	ft_cmdfree(t_cmd ***cmd);
+void	ft_perror_exit(char *shell, char *file, char *strerr, int exit_bnr);
 
-void	ft_execute_recursive_pipe(t_data *data, int fd, int i);
+void	ft_execute_recursive_pipe(t_data data, int fd, int i);
+void	ft_execute_recursive_redirection(t_data data, int i);
+void	ft_execve(t_data data, int i);
 
 void	sigint_ctrl_c_handler(int signum);
 void	sigquit_ctrl_slash_handler(int signum);
 void	sigexit_ctrl_d_handler(t_data *data);
 
 int		ft_init(t_data *data, char **env);
-void	ft_init_t_data(t_data *data);
-int		ft_init_scmd(t_cmd **scmd, int n);
+void	ft_zero_t_data(t_data *data);
+int		ft_init_cmd(t_cmd ***cmd, int n);
+void	ft_reset_t_data(t_data *data);
 
 char	**ft_astrinit(int size);
-void	ft_astrfree(char ***str);
-void	ft_astrnfree(char ***str, int n);
+void	ft_astrprint(char **astr);
+void	ft_astrfree(char ***astr);
+void	ft_astrnfree(char ***astr, int n);
 char	*ft_getcwd(void);
 
 int		ft_parse_cmds(t_data *data, int i);
+int		ft_load_argv(char ***argv, t_list *agrs);
 
-t_envp	*ft_envpnew(char *content);
-void	ft_envpadd_back(t_envp **envp, t_envp *nw);
-void	ft_envpclear(t_envp **envp, void (*del)(char ***));
-void	ft_envpdelone(t_envp *envp, void (*del)(char ***));
-
-int		ft_isfathercmd(char *cmd);
+int		ft_isfatherapp(char *app);
 int		ft_isredirection(char c);
 t_list	*ft_new_list(char *begin, char *end);
 

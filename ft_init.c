@@ -6,92 +6,61 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 12:21:22 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/26 16:35:13 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/29 21:50:39 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void		ft_init_t_data(t_data *data)
+static int		ft_load_path_pwd(char **envp, char **pwd)
 {
-	data->line = NULL;
-	data->line1 = NULL;
-	data->line2 = NULL;
-	//data-> = NULL;
-}
+	int			ret;
+	char		*tmp;
 
-static int	ft_load_path_envp(char *tmp1, t_envp *envp)
-{
-	char	*tmp2;
-	char	*tmp3;
-	int		n;
-
-	tmp2 = NULL;
-	tmp3 = NULL;
-	if (!(tmp2 = ft_strjoin("PATH=", tmp1)) || 
-			!(tmp3 = ft_strjoin(tmp2, "/bin")) ||
-			!(envp->next = ft_envpnew(tmp3)))
-		n = -1;
-	else
-		n = 1;
-	free(tmp1);
-	free(tmp2);
-	free(tmp3);
-	return (n);
-}
-
-static int	ft_load_pwd_envp(t_envp *envp)
-{
-	char	*tmp1;
-	char	*tmp2;
-
-	if (!(tmp1 = ft_getcwd()))
+	if (!(*pwd = ft_getcwd()))
 		return (-1);
-	tmp2 = NULL;
-	if (!(tmp2 = ft_strjoin("PWD=", tmp1)) || !(envp->next = ft_envpnew(tmp2)))
-	{
-		free(tmp1);
-		free(tmp2);
-		return (-1);
-	}
-	free(tmp2);
-	return (ft_load_path_envp(tmp1, envp->next));
+	tmp = NULL;
+	ret = 1;
+	if (!(envp[3] = ft_strjoin("PWD=", *pwd)) ||
+			!(tmp = ft_strjoin("PATH=", *pwd)) ||
+			!(envp[4] = ft_strjoin(tmp, "/bin")))
+		ret = -1;
+	free(tmp);
+	return (ret);
 }
 
-static int	ft_load_envp(char **env, t_envp **envp)
+static int		ft_load_envp(char **env, char **envp, char **pwd)
 {
-	t_envp	*user;
-	t_envp	*home;
-
-	user = NULL;
-	home = NULL;
 	while (*env)
 	{
- 		if ((!ft_strncmp(*env, "USER=", 5) && !(user = ft_envpnew(*env))) ||
-				(!ft_strncmp(*env, "HOME=", 5) && !(home = ft_envpnew(*env))))
-		{
-			ft_envpdelone(user, ft_astrfree);
-			ft_envpdelone(home, ft_astrfree);
-			return (-1);
-		}
+ 		if ((!ft_strncmp(*env, "USER=", 5) && !(envp[1] = ft_strdup(*env))) ||
+			(!ft_strncmp(*env, "HOME=", 5) && !(envp[2] = ft_strdup(*env))))
+						return (-1);
 		env++;
 	}
-	if ((!user && !(user = ft_envpnew(USER))) ||
-		(!home && !(home = ft_envpnew(HOME))) || !(*envp = ft_envpnew("?=0")))
-	{
-		ft_envpdelone(user, ft_astrfree);
-		ft_envpdelone(home, ft_astrfree);
+	if (!(envp[0] = ft_strdup("?=0")) ||
+			(!envp[1] && !(envp[1] = ft_strdup(USER))) ||
+			(!envp[2] && !(envp[2] = ft_strdup(HOME))))
 		return (-1);
-	}
-	(*envp)->next = user;
-	return (ft_load_pwd_envp(user->next = home));
+	return (ft_load_path_pwd(envp, pwd));
 }
 
-int			ft_init(t_data *data, char **env)
+int				ft_init(t_data *data, char **env)
 {
-	ft_init_t_data(data);
-	data->envp = NULL;
-	if (ft_load_envp(env, &data->envp) == -1)
-		return (ft_perror(strerror(errno), data));
+	int			nbr_envp_initial;
+
+	nbr_envp_initial = 5;
+	ft_zero_t_data(data);
+	if ((data->envp = ft_astrinit(nbr_envp_initial + 1)) == NULL)
+		return (-1);
+	if (ft_load_envp(env, data->envp, &data->pwd) == -1)
+	{
+		ft_astrnfree(&data->envp, nbr_envp_initial + 1);
+		ft_free_t_data(data);
+		return (-1);
+	}
+	if (!(data->path = ft_astrinit(2)) ||
+			!(data->path[0] = ft_strdup(data->envp[4] + 5)))
+		return (-1);
 	return (1);
 }

@@ -6,17 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/28 00:42:37 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/01 22:21:41 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_envp_utils.c ft_execute.c ft_init_utils.c libft.a
-void					ft_prompt(void)
-{
-	write(1, "\x1B[32mMinishell $> \x1B[0m", 22);
-}
+//gw ft_error_free.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_execute.c ft_init_utils.c ft_execute_utils.c libft.a
 
 int					main(int ac, char **av, char **env)
 {
@@ -31,7 +27,7 @@ int					main(int ac, char **av, char **env)
 			signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR ||
 			ft_init(&data, env) == -1)
 		return (ft_perror(strerror(errno), NULL));
-	ft_prompt();
+	PROMPT;
 	while (1)
 	{
 		if ((n = get_next_line(0, &data.line)) == -1)
@@ -42,22 +38,22 @@ int					main(int ac, char **av, char **env)
 			return (ft_perror(strerror(errno), &data));
 		n = 0;
 		if (!data.line1[0])
-			ft_prompt();
+			PROMPT;
 		while (data.line1[n])
 		{
 			if (ft_parse_cmds(&data, n++) == -1)
 				return (ft_perror(strerror(errno), &data));
-			if (!data.line2[1] && ft_isfathercmd(data.scmd->app))
+			if (!data.line2[1] && ft_isfatherapp(data.cmd[0]->app))
 			{
 				write(1, "Change\n", 8); // TODO change ft_run(cmd)
-				ft_prompt();
+				PROMPT;
 			}
 			else
 			{
 				if ((father = fork()) == -1)
 					return (ft_perror(strerror(errno), &data));
 				if (father == 0)
-					ft_execute_recursive_pipe(&data, STDIN_FILENO, 0);
+					ft_execute_recursive_pipe(data, STDIN_FILENO, 0);
 				if (wait(&wstatus) == -1)
 					return (ft_perror(strerror(errno), &data));
 				if (WIFEXITED(wstatus))
@@ -65,7 +61,7 @@ int					main(int ac, char **av, char **env)
 					if ((data.status = WEXITSTATUS(wstatus)) == -1)
 						write(1, "\x1B[31mFailled\x1B[0m\n", 17);
 					if (!data.line1[n])
-						ft_prompt();
+						PROMPT;
 				}
 				else if (WIFSIGNALED(wstatus))
 				{
@@ -76,14 +72,12 @@ int					main(int ac, char **av, char **env)
 					if (WCOREDUMP(wstatus))
 					{
 						write(1, "Quit (core dumped)\n", 20);
-						ft_prompt();
+						PROMPT;
 					}
 				}
 			}
-			ft_astrfree(&data.line2);///////////////
 		}
-		ft_free_t_data(&data);
-		ft_init_t_data(&data);
+		ft_reset_t_data(&data);
 	}
 	return (ft_perror("Oops, something went wrong!", NULL));
 }

@@ -15,7 +15,7 @@
 void		sigint_ctrl_c_handler(int signum)
 {
 	write(1, "\n", 2);
-	ft_prompt();
+	PROMPT;
 	(void)signum;
 }
 

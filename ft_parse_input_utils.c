@@ -6,21 +6,21 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/27 23:07:07 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/28 01:10:09 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/01 17:53:17 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int					ft_isfathercmd(char *cmd)
+int					ft_isfatherapp(char *app)
 {
-	if (!ft_strcmp(cmd, "cd"))
+	if (!ft_strcmp(app, "cd"))
 		return (1);
-	if (!ft_strcmp(cmd, "exit"))
+	if (!ft_strcmp(app, "exit"))
 		return (2);
-	if (!ft_strcmp(cmd, "export"))
+	if (!ft_strcmp(app, "export"))
 		return (3);
-	if (!ft_strcmp(cmd, "unset"))
+	if (!ft_strcmp(app, "unset"))
 		return (4);
 	return (0);
 }
@@ -47,4 +47,22 @@ t_list		*ft_new_list(char *begin, char *end)
 		return (NULL);
 	}
 	return (new);
+}
+
+int					ft_load_argv(char ***argv, t_list *args)
+{
+	int				i;
+
+	if (!((*argv) = ft_astrinit(ft_lstsize(args) + 2)))
+		return (-1);
+	i = 0;
+	if (!((*argv)[i++] = ft_strdup("42")))
+		return (-1);
+	while (args)
+	{
+		if (!((*argv)[i++] = ft_strdup(args->content)))
+			return (-1);
+		args = args->next;
+	}
+	return (1);
 }

@@ -6,98 +6,110 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 20:53:17 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/28 01:31:52 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/01 17:58:58 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int			ft_extract_token(char **cmd, t_list **list)
+static int			ft_extract_redirections(char **line2, t_list **list)
 {
 	char			*tmp;
 	t_list			*new;
 
-	tmp = *cmd;
-	if (ft_isredirection(*tmp))
-		while (*tmp && ft_isredirection(*tmp))
-			tmp++;
-	else
-		while (*tmp && !ft_isspace(*tmp) && !(ft_isredirection(*tmp)))
-			tmp++;
-	if ((new = ft_new_list(*cmd, tmp)) == NULL)
+	tmp = *line2 + 1;
+	if (*tmp && ft_isredirection(*tmp))
+		tmp++;
+	if ((new = ft_new_list(*line2, tmp)) == NULL)
 		return (-1);
 	ft_lstadd_back(list, new);
-	*cmd = tmp;
+	tmp = ft_isfx_ptrmove(tmp, ft_isspace, NULL);
+	*line2 = tmp;
 	return (1);
 }
 
-static int			ft_extract_app(char **cmd, char **app)
+static int			ft_extract_token(char **line2, t_list **list)
+{
+	char			*tmp;
+	t_list			*new;
+
+	tmp = *line2;
+	while (*tmp && !ft_isspace(*tmp) && !(ft_isredirection(*tmp)))
+		tmp++;
+	if ((new = ft_new_list(*line2, tmp)) == NULL)
+		return (-1);
+	ft_lstadd_back(list, new);
+	*line2 = tmp;
+	return (1);
+}
+
+static int			ft_extract_app(char **line2, char **app)
 {
 	int				n;
 	char			*tmp;
 
-	tmp = *cmd;
+	tmp = *line2;
 	while (*tmp && !ft_isspace(*tmp) && !(ft_isredirection(*tmp)))
 		tmp++;
-	n = tmp - *cmd;
+	n = tmp - *line2;
 	if ((*app = (char *)malloc(sizeof(**app) * (n + 1))) == NULL)
 		return (-1);
 	(*app)[n] = '\0';
-	ft_strlcpy(*app, *cmd, n + 1);
-	*cmd = tmp;
+	ft_strlcpy(*app, *line2, n + 1);
+	*line2 = tmp;
 	return (1);
 }
 
-static int			ft_recursive_parse_cmd(char *cmd, t_cmd *scmd)
+static int			ft_recursive_parse_line2(char *line2, t_cmd *cmd)
 {
-	cmd = ft_isfx_ptrmove(cmd, ft_isspace, NULL);
-	if (!(*cmd))
+	line2 = ft_isfx_ptrmove(line2, ft_isspace, NULL);
+	if (!(*line2))
 		return (1);
-	if (ft_isredirection(*cmd))
+	if (ft_isredirection(*line2))
 	{
-		if (ft_extract_token(&cmd, &scmd->redirections) == -1)
-			return (-1);
-		cmd = ft_isfx_ptrmove(cmd, ft_isspace, NULL);
-		if (!(*cmd))
-			return (1);
-		if (ft_extract_token(&cmd, &scmd->files) == -1)
+		if (ft_extract_redirections(&line2, &cmd->redirections) == -1 ||
+				ft_extract_token(&line2, &cmd->files) == -1)
 			return (-1);
 	}
-	else if (scmd->app)
+	else if (cmd->app)
 	{
-		if (ft_extract_token(&cmd, &scmd->args) == -1)
+		if (ft_extract_token(&line2, &cmd->args) == -1)
 			return (-1);
 	}
-	else
-		if (ft_extract_app(&cmd, &scmd->app) == -1)
+	else if (ft_extract_app(&line2, &cmd->app) == -1)
 			return (-1);
-	return (ft_recursive_parse_cmd(cmd, scmd));
+	return (ft_recursive_parse_line2(line2, cmd));
 }
 
 int					ft_parse_cmds(t_data *data, int i)
 {
 	int				n;
-
+	
+	ft_astrfree(&data->line2);
 	if ((data->line2 = ft_split(data->line1[i], '|')) == NULL)
 		return (-1);
 	n = 0;
 	while (data->line2[n])
 		n++;
-	if (ft_init_scmd(&data->scmd, n) == -1)
+	if (ft_init_cmd(&data->cmd, n) == -1)
 		return (-1);
 	while (--n >= 0)
 	{
-		if (ft_recursive_parse_cmd(data->line2[n], &data->scmd[n]) == -1)
+		if (ft_recursive_parse_line2(data->line2[n], data->cmd[n]) == -1)
 			return (-1);
-		ft_printf("cmd: %s\n", data->scmd[n].app);
+		if (ft_load_argv(&data->cmd[n]->argv, data->cmd[n]->args) == -1)
+			return (-1);
+		///////////////////////////////////////////
+		/*ft_printf("cmd: %s\n", data->cmd[n]->app);
 
-		t_list *x = data->scmd[n].args;
+		t_list *x = data->cmd[n]->args;
+		if (x){
 		ft_printf("args: %s, ", x->content);
 		while ((x = x->next))
 			ft_printf("%s, ", x->content);
-		write(1, "\n", 1);
+		write(1, "\n", 1);}
 
-		x = data->scmd[n].redirections;
+		x = data->cmd[n]->redirections;
 		if (x){
 		ft_printf("redirections: %s, ", x->content);
 		while ((x = x->next))
@@ -105,12 +117,13 @@ int					ft_parse_cmds(t_data *data, int i)
 		write(1, "\n", 1);}
 		
 
-		x = data->scmd[n].files;
+		x = data->cmd[n]->files;
 		if (x){
 		ft_printf("files: %s, ", x->content);
 		while ((x = x->next))
 			ft_printf("%s, ", x->content);
-		write(1, "\n", 1);}
+		write(1, "\n", 1);}*/
+		////////////////////////////////////////////
 	}
 	return (1);
 }

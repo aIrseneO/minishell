@@ -6,22 +6,49 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/28 00:27:43 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/28 00:38:38 by atemfack         ###   ########.fr       */
+/*   Updated: 2020/12/29 21:50:41 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			ft_init_scmd(t_cmd **scmd, int n)
+void		ft_reset_t_data(t_data *data)
 {
-	if ((*scmd = (t_cmd *)malloc(sizeof(**scmd) * n)) == NULL)
+	free(data->line);
+	ft_astrfree(&data->line1);
+	ft_astrfree(&data->line2);
+	ft_cmdfree(&data->cmd);
+	ft_zero_t_data(data);
+}
+
+void		ft_zero_t_data(t_data *data)
+{
+	data->pwd = NULL;
+	data->line = NULL;
+	data->line1 = NULL;
+	data->line2 = NULL;
+	data->cmd = NULL;
+}
+
+int			ft_init_cmd(t_cmd ***cmd, int n)
+{
+	int		i;
+
+	if ((*cmd = (t_cmd **)malloc(sizeof(**cmd) * (n + 1))) == NULL)
 		return (-1);
-	while (--n >= 0)
+	i = 0;
+	while (i <= n)
+		(*cmd)[i++] = NULL;
+	i = 0;
+	while (i < n)
 	{
-		(*scmd)[n].app = NULL;
-		(*scmd)[n].args = NULL;
-		(*scmd)[n].redirections = NULL;
-		(*scmd)[n].files = NULL;
+		if (((*cmd)[i] = (t_cmd *)malloc(sizeof(***cmd))) == NULL)
+			return (-1);
+		(*cmd)[i]->app = NULL;
+		(*cmd)[i]->args = NULL;
+		(*cmd)[i]->redirections = NULL;
+		(*cmd)[i]->files = NULL;
+		(*cmd)[i++]->argv = NULL;
 	}
 	return (1);
 }
