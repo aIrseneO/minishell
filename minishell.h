@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/02 00:45:37 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/03 23:37:06 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,13 @@ typedef struct			s_cmd
 
 typedef struct			s_data
 {
-	char		*pwd;
+	char		*pwd; /////
+	char		**path; /////
+	char		**envp;
+
 	char		*line;
 	char		**line1;
 	char		**line2;
-	char		**envp;
-	char		**path; /////
 	t_cmd		**cmd;
 	int			status;
 }						t_data;
@@ -76,7 +77,8 @@ typedef struct			s_data
 int		ft_perror(char *_errmsg, t_data *data);
 void	ft_free_t_data(t_data *data);
 void	ft_cmdfree(t_cmd ***cmd);
-void	ft_perror_exit(char *shell, char *file, char *strerr, int exit_bnr);
+void	ft_perror_exit(char *s1, char *s2, char *s3, int n);
+int		ft_perror_return(char *s1, char *s2, char *s3, int n);
 
 void	ft_execute_recursive_pipe(t_data data, int fd, int i);
 void	ft_execute_recursive_redirection(t_data data, int i);
@@ -87,7 +89,6 @@ void	sigquit_ctrl_slash_handler(int signum);
 void	sigexit_ctrl_d_handler(t_data *data);
 
 int		ft_init(t_data *data, char **env);
-void	ft_zero_t_data(t_data *data);
 int		ft_init_cmd(t_cmd ***cmd, int n);
 void	ft_reset_t_data(t_data *data);
 
@@ -103,5 +104,7 @@ int		ft_load_argv(char ***argv, t_list *agrs);
 int		ft_isfatherapp(char *app);
 int		ft_isredirection(char c);
 t_list	*ft_new_list(char *begin, char *end);
+
+int		ft_syntax_check(char **line);
 
 #endif

@@ -6,13 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/01 22:21:41 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/04 00:54:54 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_execute.c ft_init_utils.c ft_execute_utils.c libft.a
+//gw ft_error_free_exit.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_execute.c ft_execute_utils.c ft_syntax_check.c libft.a
 
 int					main(int ac, char **av, char **env)
 {
@@ -30,8 +30,9 @@ int					main(int ac, char **av, char **env)
 	PROMPT;
 	while (1)
 	{
-		if ((n = get_next_line(0, &data.line)) == -1)
-			return (ft_perror(strerror(errno), &data));
+		while (ft_syntax_check(&data.line) == -1)
+			if ((n = get_next_line(0, &data.line)) == -1)
+				return (ft_perror(strerror(errno), &data));
 		if (!n && !(*data.line))
 			sigexit_ctrl_d_handler(&data);
 		if ((data.line1 = ft_split(data.line, ';')) == NULL)

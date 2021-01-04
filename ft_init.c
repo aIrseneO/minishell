@@ -6,11 +6,43 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 12:21:22 by atemfack          #+#    #+#             */
-/*   Updated: 2020/12/29 21:50:39 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/03 23:38:27 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void		ft_reset_t_data(t_data *data)
+{
+	free(data->line);
+	data->line = NULL;
+	ft_astrfree(&data->line1);
+	ft_astrfree(&data->line2);
+	ft_cmdfree(&data->cmd);
+}
+
+int				ft_init_cmd(t_cmd ***cmd, int n)
+{
+	int			i;
+
+	if ((*cmd = (t_cmd **)malloc(sizeof(**cmd) * (n + 1))) == NULL)
+		return (-1);
+	i = 0;
+	while (i <= n)
+		(*cmd)[i++] = NULL;
+	i = 0;
+	while (i < n)
+	{
+		if (((*cmd)[i] = (t_cmd *)malloc(sizeof(***cmd))) == NULL)
+			return (-1);
+		(*cmd)[i]->app = NULL;
+		(*cmd)[i]->args = NULL;
+		(*cmd)[i]->redirections = NULL;
+		(*cmd)[i]->files = NULL;
+		(*cmd)[i++]->argv = NULL;
+	}
+	return (1);
+}
 
 static int		ft_load_path_pwd(char **envp, char **pwd)
 {
@@ -50,7 +82,13 @@ int				ft_init(t_data *data, char **env)
 	int			nbr_envp_initial;
 
 	nbr_envp_initial = 5;
-	ft_zero_t_data(data);
+	data->pwd = NULL;
+	data->path = NULL;
+	data->envp = NULL;
+	data->line = NULL;
+	data->line1 = NULL;
+	data->line2 = NULL;
+	data->cmd = NULL;
 	if ((data->envp = ft_astrinit(nbr_envp_initial + 1)) == NULL)
 		return (-1);
 	if (ft_load_envp(env, data->envp, &data->pwd) == -1)
