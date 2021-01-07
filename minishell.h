@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/03 23:37:06 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/06 21:24:52 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,14 +97,20 @@ void	ft_astrprint(char **astr);
 void	ft_astrfree(char ***astr);
 void	ft_astrnfree(char ***astr, int n);
 char	*ft_getcwd(void);
+void	ft_cswap(char *c1, char *c2);
+int		ft_isquotation(char c);
+int		ft_isredirection(char c);
+char	*ft_strjoin2(char const *s1, char const *s2, char const *s3);
 
 int		ft_parse_cmds(t_data *data, int i);
 int		ft_load_argv(char ***argv, t_list *agrs);
 
 int		ft_isfatherapp(char *app);
-int		ft_isredirection(char c);
 t_list	*ft_new_list(char *begin, char *end);
 
 int		ft_syntax_check(char **line);
+int		ft_bad_syntax(char *s, char c);
+int		ft_recursive_check(char **line, int i);
+char	*ft_fix_quotations(char *line, int i);
 
 #endif

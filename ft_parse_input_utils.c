@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/27 23:07:07 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/01 17:53:17 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/05 12:45:01 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,6 @@ int					ft_isfatherapp(char *app)
 	return (0);
 }
 
-int					ft_isredirection(char c)
-{
-	return (c == '<' || c == '>');
-}
-
 t_list		*ft_new_list(char *begin, char *end)
 {
 	int				n;
@@ -37,10 +32,10 @@ t_list		*ft_new_list(char *begin, char *end)
 	char			*tmp;
 
 	n = end - begin;
-	if ((tmp = (char *)malloc(sizeof(*tmp) * (n + 1))) == NULL)
+	if ((tmp = (char *)malloc(sizeof(*tmp) * (n + 2))) == NULL)
 		return (NULL);
-	ft_strlcpy(tmp, begin, n + 1);
-	tmp[n] = '\0';
+	ft_strlcpy(tmp, begin, n + 2);
+	tmp[n + 1] = '\0';
 	if ((new = ft_lstnew(tmp)) == NULL)
 	{
 		free(tmp);

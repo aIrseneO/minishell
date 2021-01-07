@@ -6,13 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:51:22 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/01 22:40:06 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/06 22:09:08 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*
+/*			Made for testing
 **	static void		ft_execvp(char *line)
 **	{
 **		char *ag[] = {"/bin/sh", "-c", line, NULL};
@@ -22,21 +22,6 @@
 **		write(1, "Oops, something went wrong!\n", 28);
 **	}
 */
-
-void		ft_execve(t_data data, int i)
-{
-	//char		path[PATH_MAX];
-
-	char *path;
-	path = ft_strjoin(ft_strjoin(data.path[0], "/"), data.cmd[i]->app);
-	//ft_printf("%s\n", path);
-	//ft_astrprint(data.cmd[i]->argv);
-	//ft_astrprint(data.envp);
-
-	data.cmd[i]->argv[0] = path;
-	execve(path, data.cmd[i]->argv, data.envp);
-	write(1, "Oops, something went wrong!\n", 28);
-}
 
 static void		ft_execute(t_data data, int i)
 {

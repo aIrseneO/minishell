@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 20:53:17 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/01 17:58:58 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/05 12:45:16 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,30 @@ static int			ft_extract_redirections(char **line2, t_list **list)
 
 static int			ft_extract_token(char **line2, t_list **list)
 {
-	char			*tmp;
+	char			*begin;
+	char			*end;
 	t_list			*new;
+	char			c;
 
-	tmp = *line2;
-	while (*tmp && !ft_isspace(*tmp) && !(ft_isredirection(*tmp)))
-		tmp++;
-	if ((new = ft_new_list(*line2, tmp)) == NULL)
+	if ((c = ft_isquotation(**line2)))
+	{
+		begin = *line2 + 1;
+		end = begin;
+		while (*end != c)
+			end++;
+		*line2 = end-- + 1;
+	}
+	else
+	{
+		begin = *line2;
+		end = begin;
+		while (*end && !ft_isspace(*end) && !(ft_isredirection(*end)))
+			end++;
+		*line2 = end--;
+	}
+	if ((new = ft_new_list(begin, end)) == NULL)
 		return (-1);
 	ft_lstadd_back(list, new);
-	*line2 = tmp;
 	return (1);
 }
 

@@ -6,13 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/04 00:54:54 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/06 22:08:18 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw ft_error_free_exit.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_execute.c ft_execute_utils.c ft_syntax_check.c libft.a
+//gw ft_error_free_exit.c ft_parse_input.c ft_parse_input_utils.c ft_init.c main.c ft_signal_handler.c ft_utils1.c ft_utils2.c ft_execute.c ft_execute_utils1.c ft_execute_utils2.c ft_syntax_check.c ft_syntax_check_utils1.c ft_syntax_check_utils2.c libft.a
 
 int					main(int ac, char **av, char **env)
 {
