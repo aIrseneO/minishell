@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/06 21:24:52 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/08 02:08:09 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,11 @@ int		ft_perror_return(char *s1, char *s2, char *s3, int n);
 void	ft_execute_recursive_pipe(t_data data, int fd, int i);
 void	ft_execute_recursive_redirection(t_data data, int i);
 void	ft_execve(t_data data, int i);
+int		ft_execute_if_father_app(t_data *data);
+
+int		ft_export(t_data *data);
+int		ft_unset(t_data *data);
+void	ft_exit(t_data data);
 
 void	sigint_ctrl_c_handler(int signum);
 void	sigquit_ctrl_slash_handler(int signum);
@@ -94,8 +99,10 @@ void	ft_reset_t_data(t_data *data);
 
 char	**ft_astrinit(int size);
 void	ft_astrprint(char **astr);
+int		ft_astrcpy(char **dest, char **src);
 void	ft_astrfree(char ***astr);
 void	ft_astrnfree(char ***astr, int n);
+int		ft_astrsize(char **astr);
 char	*ft_getcwd(void);
 void	ft_cswap(char *c1, char *c2);
 int		ft_isquotation(char c);
@@ -104,9 +111,9 @@ char	*ft_strjoin2(char const *s1, char const *s2, char const *s3);
 
 int		ft_parse_cmds(t_data *data, int i);
 int		ft_load_argv(char ***argv, t_list *agrs);
-
-int		ft_isfatherapp(char *app);
 t_list	*ft_new_list(char *begin, char *end);
+
+int		ft_replace_envp_in_cmd(char **app, char ***argv, char **envp);
 
 int		ft_syntax_check(char **line);
 int		ft_bad_syntax(char *s, char c);
