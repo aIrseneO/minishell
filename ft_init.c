@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 12:21:22 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/03 23:38:27 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/07 18:42:57 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,44 +44,29 @@ int				ft_init_cmd(t_cmd ***cmd, int n)
 	return (1);
 }
 
-static int		ft_load_path_pwd(char **envp, char **pwd)
-{
-	int			ret;
-	char		*tmp;
-
-	if (!(*pwd = ft_getcwd()))
-		return (-1);
-	tmp = NULL;
-	ret = 1;
-	if (!(envp[3] = ft_strjoin("PWD=", *pwd)) ||
-			!(tmp = ft_strjoin("PATH=", *pwd)) ||
-			!(envp[4] = ft_strjoin(tmp, "/bin")))
-		ret = -1;
-	free(tmp);
-	return (ret);
-}
-
 static int		ft_load_envp(char **env, char **envp, char **pwd)
 {
 	while (*env)
 	{
- 		if ((!ft_strncmp(*env, "USER=", 5) && !(envp[1] = ft_strdup(*env))) ||
-			(!ft_strncmp(*env, "HOME=", 5) && !(envp[2] = ft_strdup(*env))))
+ 		if ((!ft_strncmp(*env, "USER=", 5) && !(envp[0] = ft_strdup(*env))) ||
+			(!ft_strncmp(*env, "HOME=", 5) && !(envp[1] = ft_strdup(*env))))
 						return (-1);
 		env++;
 	}
-	if (!(envp[0] = ft_strdup("?=0")) ||
-			(!envp[1] && !(envp[1] = ft_strdup(USER))) ||
-			(!envp[2] && !(envp[2] = ft_strdup(HOME))))
+	if (!(*pwd = ft_getcwd()) ||
+			(!envp[0] && !(envp[0] = ft_strdup(USER))) ||
+			(!envp[1] && !(envp[1] = ft_strdup(HOME))) ||
+			!(envp[2] = ft_strjoin("PWD=", *pwd)) ||
+			!(envp[3] = ft_strjoin2("PATH=", *pwd, "/bin")))
 		return (-1);
-	return (ft_load_path_pwd(envp, pwd));
+	return (0);
 }
 
 int				ft_init(t_data *data, char **env)
 {
 	int			nbr_envp_initial;
 
-	nbr_envp_initial = 5;
+	nbr_envp_initial = 4;
 	data->pwd = NULL;
 	data->path = NULL;
 	data->envp = NULL;
@@ -98,7 +83,7 @@ int				ft_init(t_data *data, char **env)
 		return (-1);
 	}
 	if (!(data->path = ft_astrinit(2)) ||
-			!(data->path[0] = ft_strdup(data->envp[4] + 5)))
+			!(data->path[0] = ft_strdup(data->envp[3] + 5)))
 		return (-1);
 	return (1);
 }

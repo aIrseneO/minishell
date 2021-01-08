@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 22:05:48 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/07 00:38:36 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/08 03:05:59 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,11 @@ static int			ft_get_path(char *path, t_data data, int i)
 void				ft_execve(t_data data, int i)
 {
 	char			path[PATH_MAX];
-
-	if (!(ft_get_path(path, data, i)))
+	
+	if (ft_replace_envp_in_cmd(&data.cmd[i]->app,
+			&data.cmd[i]->argv, data.envp) == -1)
+		ft_perror_exit("\x1B[31mMinishell: \x1B[0m", NULL, strerror(errno), -1);
+	if (!data.path || !(ft_get_path(path, data, i)))
 		ft_perror_exit("\x1B[33mMinishell: \x1B[0m", data.cmd[i]->app, 
 				"command not found", 127);
 	data.cmd[i]->argv[0] = path;

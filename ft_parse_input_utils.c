@@ -6,24 +6,11 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/27 23:07:07 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/05 12:45:01 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/07 09:08:50 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int					ft_isfatherapp(char *app)
-{
-	if (!ft_strcmp(app, "cd"))
-		return (1);
-	if (!ft_strcmp(app, "exit"))
-		return (2);
-	if (!ft_strcmp(app, "export"))
-		return (3);
-	if (!ft_strcmp(app, "unset"))
-		return (4);
-	return (0);
-}
 
 t_list		*ft_new_list(char *begin, char *end)
 {

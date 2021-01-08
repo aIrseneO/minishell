@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:17:44 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/03 23:39:27 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/07 23:35:30 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void		ft_perror_exit(char *s1, char *s2, char *s3, int n)
 	if (s2)
 	{
 		write(1, s2, ft_strlen(s2));
-		write(1, " : ", 3);
+		write(1, ": ", 3);
 	}
 	if (s3)
 		write(1, s3, ft_strlen(s3));
@@ -32,7 +32,7 @@ int			ft_perror_return(char *s1, char *s2, char *s3, int n)
 	if (s2)
 	{
 		write(1, s2, ft_strlen(s2));
-		write(1, " : ", 3);
+		write(1, " :", 3);
 	}
 	if (s3)
 		write(1, s3, ft_strlen(s3));
