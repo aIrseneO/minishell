@@ -6,13 +6,13 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/12 23:22:39 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/13 19:57:52 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw -I libft sh_error_free_exit.c sh_parse_input.c sh_parse_input_utils.c sh_init.c sh_init_utils.c main.c sh_signal_handler.c sh_execute.c sh_execute_utils.c sh_syntax_check.c sh_syntax_check_utils1.c sh_syntax_check_utils2.c sh_run.c sh_run_unset.c sh_run_export.c libft/libft.a
+//gw -I libft -I includes srcs/sh_error_free_exit.c srcs/sh_parse_input.c srcs/sh_parse_input_utils.c srcs/sh_init.c srcs/sh_init_utils.c srcs/main.c srcs/sh_signal_handler.c srcs/sh_execute.c srcs/sh_execute_utils.c srcs/sh_syntax_check.c srcs/sh_syntax_check_utils1.c srcs/sh_syntax_check_utils2.c srcs/sh_run.c srcs/sh_run_unset.c srcs/sh_run_export.c libft/libft.a
 
 int					main(int ac, char **av, char **env)
 {

@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/12 20:57:19 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/14 22:27:15 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 # define PATH_MAX	4096
 # define USER		"USER=user42"
 # define HOME		"HOME=/home/user42"
-# define PROMPT		write(1, "\x1B[32mMinishell_> \x1B[0m", 21)
+# define PROMPT		write(1, "\n\x1B[32mMinishell_> \x1B[0m", 22)
 # define _IN_		STDIN_FILENO
 # define _OUT_		STDOUT_FILENO
 
@@ -89,7 +89,7 @@ void	sh_execve(t_data data, int i);
 int		sh_run_if_father_app(t_data *data, int n);
 int		sh_export(t_data *data);
 int		sh_unset(t_data *data);
-void	sh_exit(t_data data);
+void	sh_exit(t_data data, int exno);
 
 void	sigint_ctrl_c_handler(int signum);
 void	sigquit_ctrl_slash_handler(int signum);

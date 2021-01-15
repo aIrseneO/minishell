@@ -6,16 +6,16 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 09:05:50 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/12 19:25:17 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/14 21:31:03 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sh_exit(t_data data)
+void	sh_exit(t_data data, int exno)
 {
 	sh_free_t_data(&data);
-	exit(0);
+	exit(exno);
 }
 
 static int	sh_cd(t_data *data)
@@ -38,8 +38,8 @@ static int	sh_cd(t_data *data)
 		return (sh_perror_return("\x1B[33mMinishell: \x1B[0m", "cd",
 				"too many arguments", 1));
 	else if (chdir(data->cmd[0]->argv[1]) == -1)
-		return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
-				"cd", strerror(errno), 1));
+		return (sh_perror_return("\x1B[33mMinishell: cd: \x1B[0m",
+				data->cmd[0]->argv[1], strerror(errno), 1));
 	return (0);
 }
 
@@ -52,7 +52,7 @@ int	sh_run_if_father_app(t_data *data, int n)
 	else if (!ft_strcmp(data->cmd[0]->app, "unset"))
 		data->status = sh_unset(data);
 	else if (!ft_strcmp(data->cmd[0]->app, "exit"))
-		sh_exit(*data);
+		sh_exit(*data, 0);
 	else
 		return (0);
 	if (!data->line1[n])

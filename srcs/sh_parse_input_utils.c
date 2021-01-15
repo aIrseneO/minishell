@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/27 23:07:07 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/12 23:59:58 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/14 21:49:06 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static char	*sh_replace_envp_value(char *str, int *i, char **envp)
 
 	n = 0;
 	tmp = str + *i;
-	while (tmp[n] && tmp[n] != '$')
+	while (tmp[n] && !ft_strchr("$/", tmp[n]))
 		n++;
 	while (*envp)
 	{

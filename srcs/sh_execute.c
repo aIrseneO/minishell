@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:51:22 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/13 00:14:42 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/13 20:11:31 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,23 +89,23 @@ void	sh_execute_recursive_pipe(t_data data, int fd, int i)
 	{
 		if ((fd != STDIN_FILENO)
 				&& ((dup2(fd, STDIN_FILENO) == -1 || close(fd) == -1)))
-			exit(-1);
+			sh_perror_exit(RED, NULL, strerror(errno), -1);
 		sh_execute(data, i);
 	}
 	if (pipe(pipefd) == -1)
-		exit(-1);
+		sh_perror_exit(RED, NULL, strerror(errno), -1);
 	father = fork();
 	if (father == -1)
-		exit(-1);
+		sh_perror_exit(RED, NULL, strerror(errno), -1);
 	if (father == 0)
 	{
 		if (close(pipefd[0]) == -1 || dup2(fd, STDIN_FILENO) == -1
 			|| dup2(pipefd[1], STDOUT_FILENO) == -1
 			|| close(pipefd[1]) == -1 || close(fd) == -1)
-			exit(-1);
+			sh_perror_exit(RED, NULL, strerror(errno), -1);
 		sh_execute(data, i);
 	}
 	if (wait(NULL) == -1 || close(pipefd[1]) == -1)
-		exit(-1);
+		sh_perror_exit(RED, NULL, strerror(errno), -1);
 	sh_execute_recursive_pipe(data, pipefd[0], i + 1);
 }
