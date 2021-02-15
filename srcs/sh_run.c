@@ -6,58 +6,73 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 09:05:50 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/14 21:31:03 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/14 13:10:06 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sh_exit(t_data data, int exno)
+// watch up for this commands: unset HOME; unset PWD
+
+static int	sh_save(t_data *data, int std_out_in[2], t_list *redirect_file[2])
 {
-	sh_free_t_data(&data);
-	exit(exno);
+	std_out_in[0] = dup(STDOUT_FILENO);
+	std_out_in[1] = dup(STDIN_FILENO);
+	if (!std_out_in[0] || !std_out_in[1])
+		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
+				"Couldn't save a STD_FILENO", strerror(errno), -1));
+	redirect_file[0] = data->cmd[0]->redirections;
+	redirect_file[1] = data->cmd[0]->files;
+	return (0);
 }
 
-static int	sh_cd(t_data *data)
+static int	sh_restore(t_data *data, int std_out_in[2], t_list *redrct_file[2])
 {
-	int				i;
-
-	if (!data->cmd[0]->argv[1])
-	{
-		i = 0;
-		while (data->envp[i] && ft_strncmp(data->envp[i], "HOME=", 5))
-			i++;
-		if (!data->envp[i])
-			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
-					"cd", "HOME not set", 1));
-		if (chdir(data->envp[i] + 5) == -1)
-			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
-					"cd", strerror(errno), 1));
-	}
-	else if (data->cmd[0]->argv[2])
-		return (sh_perror_return("\x1B[33mMinishell: \x1B[0m", "cd",
-				"too many arguments", 1));
-	else if (chdir(data->cmd[0]->argv[1]) == -1)
-		return (sh_perror_return("\x1B[33mMinishell: cd: \x1B[0m",
-				data->cmd[0]->argv[1], strerror(errno), 1));
+	if (dup2(std_out_in[0], STDOUT_FILENO) == -1
+		|| dup2(std_out_in[1], STDIN_FILENO) == -1)
+		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
+				"Couldn't restore a STD_FILENO", strerror(errno), -1));
+	data->cmd[0]->redirections = redrct_file[0];
+	data->cmd[0]->files = redrct_file[1];
 	return (0);
 }
 
 int	sh_run_if_father_app(t_data *data, int n)
 {
+	int			std_out_in[2];
+	t_list		*redirections_files[2];
+
+	if (sh_save(data, std_out_in, redirections_files) == -1)
+		return (-1);
 	if (!ft_strcmp(data->cmd[0]->app, "cd"))
-		data->status = sh_cd(data);
+		sh_recursive_redirection(data, 0, sh_cd);
 	else if (!ft_strcmp(data->cmd[0]->app, "export"))
-		data->status = sh_export(data);
+		sh_recursive_redirection(data, 0, sh_export);
 	else if (!ft_strcmp(data->cmd[0]->app, "unset"))
-		data->status = sh_unset(data);
+		sh_recursive_redirection(data, 0, sh_unset);
 	else if (!ft_strcmp(data->cmd[0]->app, "exit"))
-		sh_exit(*data, 0);
+		sh_recursive_redirection(data, 0, sh_exit);
+	else if (!ft_strcmp(data->cmd[0]->app, "pwd"))
+		sh_recursive_redirection(data, 0, sh_pwd);
 	else
 		return (0);
+	if (sh_restore(data, std_out_in, redirections_files) == -1)
+		return (-1);
 	if (!data->line1[n])
-		PROMPT;
+		prompt(data->mode);
 	return (1);
 }
 
-// watch up for this commands: unset HOME; unset PWD
+void	sh_execute_if_father_app(t_data *data, int n)
+{
+	if (!ft_strcmp(data->cmd[n]->app, "cd"))
+		exit(sh_cd(data, n));
+	else if (!ft_strcmp(data->cmd[n]->app, "export"))
+		exit(sh_export(data, n));
+	else if (!ft_strcmp(data->cmd[n]->app, "unset"))
+		exit(sh_unset(data, n));
+	else if (!ft_strcmp(data->cmd[n]->app, "exit"))
+		exit(sh_exit(data, n));
+	else if (!ft_strcmp(data->cmd[n]->app, "pwd"))
+		exit(sh_pwd(data, n));
+}

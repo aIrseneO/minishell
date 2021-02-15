@@ -6,64 +6,74 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 22:37:40 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/12 00:03:14 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/14 13:18:40 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	sh_check_semicolon(char **line, int i)
+{
+	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
+	if ((*line)[i] == ';' || (*line)[i] == '|')
+		return (sh_bad_syntax(NULL, (*line)[i]));
+	return (sh_recursive_check(line, i));
+}
+
+int	sh_check_redirection(char **line, int i)
+{
+	if (ft_isredirection((*line)[i + 1])
+		&& !ft_strncmp(*line + i++, "><", 2))
+		return (sh_bad_syntax("<", 0));
+	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
+	if (!(*line)[i])
+		return (sh_bad_syntax("newline", 0));
+	if (ft_strchr("|;><", (*line)[i]))
+		return (sh_bad_syntax(NULL, (*line)[i]));
+	return (sh_recursive_check(line, i));
+}
+
 int	sh_bad_syntax(char *s, char c)
 {
-	write(1,
+	write(STDERR_FILENO,
 		"\x1B[33mMinishell: \x1B[0msyntax error near unexpected token `", 56);
 	if (s)
-		write(1, s, ft_strlen(s));
+		write(STDERR_FILENO, s, ft_strlen(s));
 	else
-		write(1, &c, 1);
-	write(1, "'\n", 2);
+		write(STDERR_FILENO, &c, 1);
+	write(STDERR_FILENO, "'\n", 2);
 	return (-1);
 }
 
-int	sh_syntax_check(char **line)
+static int	sh_set_status_prompt_and_return(t_data *data)
 {
-	char			*newline;
-
-	if (!(*line))
-		return (-1);
-	if (sh_recursive_check(line, 0) == -1)
-	{
-		free(*line);
-		*line = NULL;
-		PROMPT;
-		return (-1);
-	}
-	newline = sh_fix_quotations(*line, 0);
-	free(*line);
-	*line = NULL;
-	*line = newline;
-	if (*line == NULL)
-	{
-		sh_perror_return("\x1B[31nMinishell: \x1B[0m", NULL,
-				strerror(errno), -1);
-		PROMPT;
-		return (-1);
-	}
-	return (1);
+	data->status = 2;
+	prompt(data->mode);
+	if (data->line)
+		ft_strdel(&data->line);
+	return (-1);
 }
 
-/*
-**			To test sh_syntax_check function
-** gw sh_syntax_check.c sh_error_free_exit.c sh_utils1.c sh_parse_input_utils.c libft.a
-** int			main(int argc, char **argv)
-** {
-** 	if (argc != 2)
-** 		return (1);
-** 	char *s = ft_strdup(argv[1]);
-** 	int n = sh_syntax_check(&s);
-** 	//ft_printf("->%d<-\n", n);
-** 	ft_printf("->%s<-\n", s);
-** 	if (n != -1)
-** 		free(s);
-** 	return (1);
-** }
-*/
+int	sh_syntax_check(t_data *data)
+{
+	int				ij[2];
+	char			*newline;
+
+	if (!data->line)
+		return (-1);
+	if ((*data->line == '|' && sh_bad_syntax(NULL, *data->line)))
+		return (sh_set_status_prompt_and_return(data));
+	if (sh_recursive_check(&data->line, 0) == -1)
+		return (sh_set_status_prompt_and_return(data));
+	newline = (char *)malloc(sizeof(*newline)
+			* (2 * ft_strlen(data->line) + 1));
+	if (newline == NULL && sh_perror_return("\x1B[31mMinishell: \x1B[0m",
+			NULL, strerror(errno), -1) == -1)
+		return (sh_set_status_prompt_and_return(data));
+	ij[0] = 0;
+	ij[1] = 0;
+	newline = sh_fix_quotations(data->line, newline, ij);
+	ft_strdel(&data->line);
+	data->line = newline;
+	return (1);
+}

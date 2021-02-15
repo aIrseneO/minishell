@@ -1,30 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   sh_syntax_check_utils3.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/07 23:41:29 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/28 22:44:08 by atemfack         ###   ########.fr       */
+/*   Created: 2021/02/14 20:52:36 by atemfack          #+#    #+#             */
+/*   Updated: 2021/02/14 20:53:24 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include "libft.h"
+#include "minishell.h"
 
-int	main(int ac, char **av)
+void	sh_memcpy(char *dest, char *src, int n)
 {
-	char	pwd[4096];
-
-	(void)ac;
-	if (!getcwd(pwd, 4096))
+	while (n--)
 	{
-		ft_putstr_fd(av[0], 1);
-		ft_putendl_fd(
-			": couldn't find directory entry in ‘..’ with matching i-node", 1);
-		return (1);
+		if (*src == '\\')
+		{
+			if (*(src + 1) == '\\')
+			{
+				src++;
+				*dest++ = *src++;
+				*dest++ = BACKSLASH;
+				n--;
+			}
+			else
+			{
+				src++;
+				*dest++ = BACKSLASH;
+			}
+		}
+		else if (*src == '$' && ft_isquotation(*(src + 1)))
+		{
+			src++;
+			*dest++ = NONDOLLAR;
+		}
+		else
+			*dest++ = *src++;
 	}
-	ft_putendl_fd(pwd, 1);
-	return (0);
 }

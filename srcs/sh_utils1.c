@@ -1,36 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sh_signal_handler.c                                :+:      :+:    :+:   */
+/*   sh_utils1.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/19 18:42:48 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/15 01:39:50 by atemfack         ###   ########.fr       */
+/*   Created: 2021/02/06 04:33:32 by atemfack          #+#    #+#             */
+/*   Updated: 2021/02/15 01:47:09 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	sigint_ctrl_c_handler(int signum)
+void	prompt(int mode)
 {
-	write(STDERR_FILENO, "\n", 1);
-	prompt(0);
-	(void)signum;
+	if (mode == 0)
+		write(STDERR_FILENO, "\n\x1B[32mMinishell_> \x1B[0m", 22);
 }
 
-void	sigquit_ctrl_slash_handler(int signum)
+int	sh_isbackslash(char c)
 {
-	(void)signum;
+	return (c == '\\' || c == BACKSLASH);
 }
 
-void	sigexit_ctrl_d_handler(t_data *data)
+int	sh_isquotation(char c)
 {
-	int	exno;
+	return (c == '\'' || c == '"' || c == QUOTATION || c == OLDQUOTES);
+}
 
-	if (!data->mode)
-		write(STDERR_FILENO, "exit\n", 5);
-	exno = data->status;
-	sh_free_t_data(data);
-	exit(exno);
+int	sh_is_back_escape(char *line, int i)
+{
+	int		n;
+
+	n = 0;
+	while (i >= 0 && sh_isbackslash(line[i]))
+	{
+		n++;
+		i--;
+	}
+	return (n % 2);
 }

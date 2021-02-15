@@ -1,30 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   sh_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/07 23:41:29 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/28 22:44:08 by atemfack         ###   ########.fr       */
+/*   Created: 2021/02/03 20:53:00 by atemfack          #+#    #+#             */
+/*   Updated: 2021/02/03 20:55:11 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include "libft.h"
+#include "minishell.h"
 
-int	main(int ac, char **av)
+int	sh_pwd(t_data *data, int i)
 {
-	char	pwd[4096];
-
-	(void)ac;
-	if (!getcwd(pwd, 4096))
-	{
-		ft_putstr_fd(av[0], 1);
-		ft_putendl_fd(
-			": couldn't find directory entry in ‘..’ with matching i-node", 1);
-		return (1);
-	}
-	ft_putendl_fd(pwd, 1);
+	(void)i;
+	ft_putendl_fd(data->pwd, STDOUT_FILENO);
 	return (0);
 }

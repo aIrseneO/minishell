@@ -6,75 +6,96 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/13 19:57:52 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/15 04:06:33 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//gw -I libft -I includes srcs/sh_error_free_exit.c srcs/sh_parse_input.c srcs/sh_parse_input_utils.c srcs/sh_init.c srcs/sh_init_utils.c srcs/main.c srcs/sh_signal_handler.c srcs/sh_execute.c srcs/sh_execute_utils.c srcs/sh_syntax_check.c srcs/sh_syntax_check_utils1.c srcs/sh_syntax_check_utils2.c srcs/sh_run.c srcs/sh_run_unset.c srcs/sh_run_export.c libft/libft.a
-
-int					main(int ac, char **av, char **env)
+static void	sh_handle_child_ps_returned_value(t_data *data, int wstatus, int n)
 {
-	int				n;
-	int				wstatus;
+	if (wstatus == -1)
+		sh_perror_exit(NULL, NULL, "Child poccess faillure", -1);
+	if (WIFEXITED(wstatus))
+	{
+		data->status = WEXITSTATUS(wstatus);
+		if (data->status == -1)
+			write(STDERR_FILENO, "\x1B[31mFailled\x1B[0m\n", 17);
+		if (!data->line1[n])
+			prompt(data->mode);
+	}
+	else if (WIFSIGNALED(wstatus))
+	{
+		if (WTERMSIG(wstatus) == SIGINT)
+			data->status = 130;
+		else if (WTERMSIG(wstatus) == SIGQUIT)
+			data->status = 131;
+		if (WCOREDUMP(wstatus))
+		{
+			write(STDERR_FILENO, "Quit (core dumped)\n", 20);
+			prompt(data->mode);
+		}
+	}
+}
+
+static void	sh_parse_and_execute_each_cmd(t_data *data, int n, int wstatus)
+{
 	pid_t			father;
-	t_data			data;
 
+	while (data->line1[n])
+	{
+		wstatus = sh_parse_cmds(data, n++, 0);
+		if (wstatus == -1)
+			exit(sh_perror_free_t_data(strerror(errno), data));
+		if (wstatus == 2)
+			break ;
+		if (!data->line2[1] && data->cmd[0]->app)
+			wstatus = sh_run_if_father_app(data, n);
+		if (wstatus == -1)
+			sh_perror_exit(RED, NULL, strerror(errno), -1);
+		if (wstatus == 0)
+		{
+			father = fork();
+			if (father == -1)
+				exit(sh_perror_free_t_data(strerror(errno), data));
+			if (father == 0)
+				sh_execute_recursive_pipe(data, STDIN_FILENO, 0, 0);
+			if (wait(&wstatus) == -1)
+				exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_handle_child_ps_returned_value(data, wstatus, n);
+		}
+	}
+}
 
-	(void)ac; (void)av;
-	if (signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR ||
-			signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR ||
-			sh_init(&data, env) == -1)
-		return (sh_perror_free_t_data(strerror(errno), NULL));
-	PROMPT;
+static void	sh_minishell(t_data *data)
+{
 	while (1)
 	{
-		while (sh_syntax_check(&data.line) == -1)
-			if ((n = get_next_line(0, &data.line)) == -1)
-				return (sh_perror_free_t_data(strerror(errno), &data));
-		if (!n && !(*data.line))
-			sigexit_ctrl_d_handler(&data);
-		if ((data.line1 = ft_split(data.line, ';')) == NULL)
-			return (sh_perror_free_t_data(strerror(errno), &data));
-		n = 0;
-		if (!data.line1[0])
-			PROMPT;
-		while (data.line1[n])
-		{
-			if (sh_parse_cmds(&data, n++) == -1)
-				return (sh_perror_free_t_data(strerror(errno), &data));
-			if (!(!data.line2[1] && sh_run_if_father_app(&data, n)))
-			{
-				if ((father = fork()) == -1)
-					return (sh_perror_free_t_data(strerror(errno), &data));
-				if (father == 0)
-					sh_execute_recursive_pipe(data, STDIN_FILENO, 0);
-				if (wait(&wstatus) == -1)
-					return (sh_perror_free_t_data(strerror(errno), &data));
-				if (WIFEXITED(wstatus))
-				{
-					if ((data.status = WEXITSTATUS(wstatus)) == -1)
-						write(1, "\x1B[31mFailled\x1B[0m\n", 17);
-					if (!data.line1[n])
-						PROMPT;
-				}
-				else if (WIFSIGNALED(wstatus))
-				{
-					if (WTERMSIG(wstatus) == SIGINT)
-						data.status = 130;
-					else if (WTERMSIG(wstatus) == SIGQUIT)
-						data.status = 131;
-					if (WCOREDUMP(wstatus))
-					{
-						write(1, "Quit (core dumped)\n", 20);
-						PROMPT;
-					}
-				}
-			}
-		}
-		sh_reset_t_data(&data);
+		while (sh_syntax_check(data) == -1)
+			if (sh_get_line(data, 0) == -1)
+				exit(sh_perror_free_t_data(strerror(errno), data));
+		data->line1 = ft_split3(data->line, ';', sh_isquotation, sh_isbackslash);
+		if (data->line1 == NULL)
+			exit(sh_perror_free_t_data(strerror(errno), data));
+		if (!data->line1[0])
+			prompt(data->mode);
+		sh_parse_and_execute_each_cmd(data, 0, 0);
+		sh_reset_t_data(data);
 	}
+}
+
+int	main(int ac, char **av, char **env)
+{
+	t_data			data;
+
+	if (signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR
+		|| signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR)
+		return (sh_perror_free_t_data(strerror(errno), NULL));
+	if (sh_init(&data, ac, av, env) == -1)
+		return (sh_perror_free_t_data(strerror(errno), &data));
+	//data.mode += !(isatty(data.fd)) * 2;
+	prompt(data.mode);
+	sh_minishell(&data);
 	return (sh_perror_free_t_data("Oops, something went wrong!", NULL));
 }
 //_ https://www.gnu.org/software/libc/manual/html_node/Resource-Usage.html

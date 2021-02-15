@@ -6,119 +6,78 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 20:53:17 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/14 21:28:59 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/13 04:22:20 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	sh_extract_redirections(char **line2, t_list **list)
+static int	sh_load_argv(char ***argv, t_list *args)
 {
-	char			*tmp;
-	t_list			*new;
+	int				i;
 
-	tmp = *line2 + 1;
-	if (*tmp && ft_isredirection(*tmp))
-		tmp++;
-	new = ft_lstnew3(*line2, tmp - 1);
-	if (new == NULL)
+	*argv = ft_astrinit(ft_lstsize(args) + 2);
+	if (*argv == NULL)
 		return (-1);
-	ft_lstadd_back(list, new);
-	tmp = ft_isfx_ptrmove(tmp, ft_isspace, NULL);
-	*line2 = tmp;
-	return (1);
+	i = 0;
+	(*argv)[i] = ft_strdup("42");
+	if ((*argv)[i++] == NULL)
+		return (-1);
+	while (args)
+	{
+		(*argv)[i] = ft_strdup(args->content);
+		if ((*argv)[i++] == NULL)
+			return (-1);
+		args = args->next;
+	}
+	return (0);
 }
 
-static int	sh_extract_token(char **line2, t_list **list)
+static int	sh_update_envp_(t_data *data)
 {
-	char			*begin;
-	char			*end;
-	t_list			*new;
+	int		i;
+	char	*env;
 
-	if (ft_isquotation(**line2))
-	{
-		begin = *line2 + 1;
-		end = begin;
-		while (*end != **line2)
-			end++;
-		*line2 = end-- + 1;
-	}
+	i = 1;
+	while (data->cmd[0]->argv[i])
+		i++;
+	if (i > 1)
+		env = ft_strjoin("_=", data->cmd[0]->argv[i - 1]);
+	else if (data->cmd[0]->app)
+		env = ft_strjoin("_=", data->cmd[0]->app);
 	else
-	{
-		begin = *line2;
-		end = begin;
-		while (*end && !ft_isspace(*end) && !(ft_isredirection(*end)))
-			end++;
-		*line2 = end--;
-	}
-	new = ft_lstnew3(begin, end);
-	if (new == NULL)
+		env = ft_strdup("_=");
+	if (env == NULL)
 		return (-1);
-	ft_lstadd_back(list, new);
-	return (1);
+	i = sh_export_str(data, env, ft_strchr(env, '=') - env);
+	free(env);
+	if (i == -1)
+		return (-1);
+	return (0);
 }
 
-static int	sh_extract_app(char **line2, char **app)
+int	sh_parse_cmds(t_data *data, int i, int m)
 {
-	int				n;
-	char			*tmp;
-
-	tmp = *line2;
-	while (*tmp && !ft_isspace(*tmp) && !(ft_isredirection(*tmp)))
-		tmp++;
-	n = tmp - *line2;
-	*app = (char *)malloc(sizeof(**app) * (n + 1));
-	if (*app == NULL)
-		return (-1);
-	(*app)[n] = '\0';
-	ft_strlcpy(*app, *line2, n + 1);
-	*line2 = tmp;
-	return (1);
-}
-
-static int	sh_recursive_parse_line2(char *line2, t_cmd *cmd)
-{
-	line2 = ft_isfx_ptrmove(line2, ft_isspace, NULL);
-	if (!(*line2))
-		return (1);
-	if (ft_isredirection(*line2))
-	{
-		if (sh_extract_redirections(&line2, &cmd->redirections) == -1
-			|| sh_extract_token(&line2, &cmd->files) == -1)
-			return (-1);
-	}
-	else if (cmd->app)
-	{
-		if (sh_extract_token(&line2, &cmd->args) == -1)
-			return (-1);
-	}
-	else if (sh_extract_app(&line2, &cmd->app) == -1)
-		return (-1);
-	return (sh_recursive_parse_line2(line2, cmd));
-}
-
-int	sh_parse_cmds(t_data *data, int i)
-{
-	int				n;
+	int				j;
 
 	ft_astrfree(&data->line2, free);
-	data->line2 = ft_split(data->line1[i], '|');
+	sh_cmdfree(&data->cmd);
+	data->line2 = ft_split3(data->line1[i], '|', sh_isquotation, sh_isbackslash);
 	if (data->line2 == NULL)
 		return (-1);
-	n = 0;
-	while (data->line2[n])
-		n++;
-	if (sh_init_cmd(&data->cmd, n) == -1)
+	if (sh_init_cmd(&data->cmd, ft_astrsize(data->line2)) == -1)
 		return (-1);
-	while (--n >= 0)
+	j = 0;
+	while (data->line2[j])
 	{
-		if (sh_recursive_parse_line2(data->line2[n], data->cmd[n]) == -1)
+		m = sh_recursive_parse_line2(data, data->line2[j], 0, data->cmd[j]);
+		if (m != 0)
+			return (m);
+		if (sh_load_argv(&data->cmd[j]->argv, data->cmd[j]->args) == -1)
 			return (-1);
-		if (sh_load_argv(&data->cmd[n]->argv, data->cmd[n]->args) == -1)
-			return (-1);
-		if (sh_replace_dollarsign(&data->cmd[n]->app, &data->cmd[n]->argv,
-				data->envp, data->status) == -1)
-			return (-1);
+		j++;
 	}
-	return (1);
+	if (j == 1 && sh_update_envp_(data) == -1)
+		return (-1);
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 23:40:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/01/14 22:02:17 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/01/20 11:42:45 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,43 @@
 
 #include "libft.h"
 
-int	main(int ac, char **av)
+static int	ft_isoption(char *av, int *endl)
 {
+	if (!ft_strncmp(av, "-n", 2))
+	{
+		av += 2;
+		while (*av && *av == 'n')
+			av++;
+		if (*av)
+			return (0);
+		*endl = 1;
+		return (1);
+	}
+	return (0);
+}
+
+int	main(int argc, char **argv)
+{
+	char	**av;
 	int		endl;
 
-	if (ac == 1)
+	if (argc == 1)
 	{
 		ft_putchar_fd('\n', 1);
 		return (0);
 	}
+	av = argv + 1;
 	endl = 0;
-	if (!ft_strcmp(*(++av), "-n"))
-	{
+	while (ft_isoption(*av, &endl))
 		av++;
-		endl = 1;
-	}
-	if (endl && ac == 2)
+	if (!(*av))
 		return (0);
-	while (*(av + 1))
+	while (*av && *(av + 1))
 	{
 		ft_putstr_fd(*av++, 1);
 		ft_putchar_fd(' ', 1);
 	}
-	if (endl)
+	if (!endl)
 		ft_putendl_fd(*av, 1);
 	else
 		ft_putstr_fd(*av, 1);
