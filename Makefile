@@ -6,19 +6,19 @@
 #*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        *#
 #*                                                +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/30 15:21:51 by atemfack          #+#    #+#             *#
-#*   Updated: 2021/02/15 01:36:43 by atemfack         ###   ########.fr       *#
+#*   Updated: 2021/02/23 00:05:54 by atemfack         ###   ########.fr       *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
 NAME = minishell
 
-SRCS = main.c main_utils.c sh_signal_handler.c sh_error_free_exit.c \
+SRCS = main.c sh_signal_handler.c sh_error_free_exit.c \
 	sh_utils1.c sh_utils2.c \
 	sh_init.c sh_init_utils.c \
 	sh_parse_input.c sh_parse_input_utils1.c sh_parse_input_utils2.c \
 	sh_parse_input_utils3.c sh_parse_input_utils4.c \
 	sh_syntax_check.c sh_syntax_check_utils1.c sh_syntax_check_utils2.c \
-	sh_syntax_check_utils3.c \
+	sh_syntax_check_utils3.c sh_syntax_check_utils4.c \
 	sh_execute.c sh_execute_utils.c \
 	sh_run.c sh_cd.c sh_unset.c sh_exit.c sh_pwd.c \
 	sh_export.c sh_export_utils.c

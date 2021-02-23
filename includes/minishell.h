@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/15 02:26:12 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/23 00:02:10 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,11 @@ typedef struct s_data
 int		sh_get_line(t_data *data, int n);
 
 void	prompt(int mode);
+void	prompt2(void);
 int		sh_isbackslash(char c);
 int		sh_isquotation(char c);
 void	sh_putstr_fd(char *s, int fd);
+int		sh_is_back_escape(char *line, int i);
 
 int		sh_perror_free_t_data(char *_errmsg, t_data *data);
 void	sh_free_t_data(t_data *data);
@@ -115,7 +117,8 @@ int		sh_pwd(t_data *data, int index_cmd);
 
 void	sigint_ctrl_c_handler(int signum);
 void	sigquit_ctrl_slash_handler(int signum);
-void	sigexit_ctrl_d_handler(t_data *data);
+void	sigexit_ctrl_d_handler(t_data *data, int exno);
+void	sigappend_ctrl_d_handler(t_data *data, char **line, int n);
 
 int		sh_init(t_data *data, int ac, char **av, char **env);
 int		sh_init_cmd(t_cmd ***cmd, int n);
@@ -131,10 +134,10 @@ char	*sh_recursive_replace_dollar_clean(char *line, int i, t_data *data);
 
 int		sh_syntax_check(t_data *data);
 int		sh_bad_syntax(char *s, char c);
-int		sh_recursive_check(char **line, int i);
-int		sh_check_semicolon(char **line, int i);
-int		sh_check_redirection(char **line, int i);
-int		sh_is_back_escape(char *line, int i);
+int		sh_recursive_check(t_data *data, char **line, int i);
+int		sh_check_semicolon(t_data *data, char **line, int i);
+int		sh_check_quotation(t_data *data, char **line, int i, char c);
+int		sh_check_redirection(t_data *data, char **line, int i);
 char	*sh_fix_quotations(char *line, char *newline, int ij[2]);
 void	sh_memcpy(char *dest, char *src, int n);
 

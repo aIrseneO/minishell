@@ -6,32 +6,11 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 22:37:40 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/14 13:18:40 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/22 23:49:24 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	sh_check_semicolon(char **line, int i)
-{
-	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
-	if ((*line)[i] == ';' || (*line)[i] == '|')
-		return (sh_bad_syntax(NULL, (*line)[i]));
-	return (sh_recursive_check(line, i));
-}
-
-int	sh_check_redirection(char **line, int i)
-{
-	if (ft_isredirection((*line)[i + 1])
-		&& !ft_strncmp(*line + i++, "><", 2))
-		return (sh_bad_syntax("<", 0));
-	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
-	if (!(*line)[i])
-		return (sh_bad_syntax("newline", 0));
-	if (ft_strchr("|;><", (*line)[i]))
-		return (sh_bad_syntax(NULL, (*line)[i]));
-	return (sh_recursive_check(line, i));
-}
 
 int	sh_bad_syntax(char *s, char c)
 {
@@ -63,7 +42,7 @@ int	sh_syntax_check(t_data *data)
 		return (-1);
 	if ((*data->line == '|' && sh_bad_syntax(NULL, *data->line)))
 		return (sh_set_status_prompt_and_return(data));
-	if (sh_recursive_check(&data->line, 0) == -1)
+	if (sh_recursive_check(data, &data->line, 0) == -1)
 		return (sh_set_status_prompt_and_return(data));
 	newline = (char *)malloc(sizeof(*newline)
 			* (2 * ft_strlen(data->line) + 1));

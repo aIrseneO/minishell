@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:17:44 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/11 04:33:23 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/22 22:54:46 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,10 @@ int	sh_perror_free_t_data(char *_errmsg, t_data *data)
 	if (_errmsg)
 	{
 		write(STDERR_FILENO, RED, 5);
+		write(STDERR_FILENO, "Minishell: ", 11);
 		write(STDERR_FILENO, _errmsg, ft_strlen(_errmsg));
 		write(STDERR_FILENO, RESET, 4);
+		write(STDERR_FILENO, "\n", 1);
 	}
 	if (data)
 		sh_free_t_data(data);

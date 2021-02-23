@@ -5,145 +5,103 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/05 21:17:18 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/11 05:30:16 by atemfack         ###   ########.fr       */
+/*   Created: 2021/02/22 13:29:51 by atemfack          #+#    #+#             */
+/*   Updated: 2021/02/23 05:32:58 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	sh_fill_postquote(char *line, char *newline, int ij[2]);
-
-static void	sh_fill1(char *line, char *newline, int ij[2])
+int	sh_check_semicolon(t_data *data, char **line, int i)
 {
-	while (line[ij[1]] != '"')
+	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
+	if ((*line)[i] == ';' || (*line)[i] == '|')
+		return (sh_bad_syntax(NULL, (*line)[i]));
+	return (sh_recursive_check(data, line, i));
+}
+
+int	sh_check_redirection(t_data *data, char **line, int i)
+{
+	if (ft_isredirection((*line)[i + 1])
+		&& !ft_strncmp(*line + i++, "><", 2))
+		return (sh_bad_syntax("<", 0));
+	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
+	if (!(*line)[i])
+		return (sh_bad_syntax("newline", 0));
+	if (ft_strchr("|;><", (*line)[i]))
+		return (sh_bad_syntax(NULL, (*line)[i]));
+	return (sh_recursive_check(data, line, i));
+}
+
+static int	sh_get_line_quotation(t_data *data, char **line, int n, char *tmp1)
+{
+	n = get_next_line(data->fd, line);
+	if (n == -1)
+		exit(sh_perror_free_t_data(strerror(errno), data));
+	if (n == 0)
 	{
-		if (line[ij[1]] == '\\')
+		if (!(**line))
 		{
-			if (ft_strchr("`\"\\", line[ij[1] + 1]) && ij[1]++)
-				newline[(ij[0])++] = line[(ij[1])++];
-			else if (line[ij[1] + 1] == '$')
-			{
-				newline[(ij[0])++] = DOLLARSIG;
-				ij[1] += 2;
-			}
-			else
-				newline[(ij[0])++] = line[(ij[1])++];
+			free(*line);
+			free(tmp1);
+			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m", NULL,
+				"unexpected EOF while looking for matching `\"'", -1));
 		}
-		else
-			newline[(ij[0])++] = line[(ij[1])++];
+		sigappend_ctrl_d_handler(data, line, n);
 	}
-	newline[ij[0]++] = OLDQUOTES;
-	ij[1]++;
-	sh_fill_postquote(line, newline, ij);
+	return (0);
 }
 
-static void	sh_fill2(char *line, char *newline, int ij[2])
+static int	sh_get_line_to_append(t_data *data, char c, char **line, int *i)
 {
-	while (line[ij[1]] != '\'')
+	char	*tmp;
+	char	*tmp1;
+	char	*tmp2;
+
+	while (1)
 	{
-		if (line[ij[1]] == '$' && ij[1]++)
-			newline[(ij[0])++] = DOLLARSIG;
-		else
-			newline[(ij[0])++] = line[(ij[1])++];
+		prompt2();
+		tmp1 = *line;
+		if (sh_get_line_quotation(data, line, 0, tmp1) == -1)
+			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
+				"syntax error", "unexpected end of file", -1));
+		tmp2 = *line;
+		*line = ft_strjoin2(tmp1, "\n", tmp2);
+		free(tmp1);
+		tmp = ft_strchr(tmp2, c);
+		if (tmp && *line && !sh_is_back_escape(tmp2, tmp - tmp2 - 1))
+			break ;
+		*i += ft_strlen(tmp2) + 1;
+		free(tmp2);
+		if (*line == NULL)
+			exit(sh_perror_free_t_data(strerror(errno), data));
 	}
-	newline[ij[0]++] = OLDQUOTES;
-	ij[1]++;
-	sh_fill_postquote(line, newline, ij);
+	*i += tmp - tmp2 + 2; 
+	free(tmp2);
+	return (0);
 }
 
-static void	sh_fill_postquote(char *line, char *newline, int ij[2])
+int	sh_check_quotation(t_data *data, char **line, int i, char c)
 {
-	char		*tmp;
-	int			n;
-	char		quote;
+	char			*tmp;
+	char			*newline;
 
-	n = ij[1];
-	tmp = line + ij[1];
-	while (line[ij[1]] && !((ft_strchr(";|<>'\"", line[ij[1]])
-				|| ft_isspace(line[ij[1]]))
-			&& !sh_is_back_escape(line, ij[1] - 1)))
-		ij[1]++;
-	n = ij[1] - n;
-	if (ft_isquotation(line[ij[1]]))
+	while ((*line)[i] && !((*line)[i] == c
+				&& !(sh_is_back_escape(*line, i - 1) && c != '\'')))
+		i++;
+	if (!(*line)[i])
 	{
-		sh_memcpy(newline + ij[0], tmp, n);
-		ij[0] += n;
-		newline[(ij[0])++] = OLDQUOTES;
-		quote = line[ij[1]++];
-		if (quote == '"')
-			sh_fill1(line, newline, ij);
-		else
-			sh_fill2(line, newline, ij);
-		return ;
+		newline = NULL;
+		if (sh_get_line_to_append(data, c, &newline, &i) == -1)
+			return (-1);
+		tmp = ft_strjoin2(NULL, *line, newline);
+		free(newline);
+		if (!tmp)
+			exit(sh_perror_free_t_data(strerror(errno), data));
+		free(*line);
+		*line = tmp;
 	}
-	sh_memcpy(newline + ij[0], tmp, n);
-	ij[0] += n;
-}
-
-static void	sh_fill_prequote(char *line, char *newline, int ij[2])
-{
-	char		*tmp;
-	int			n;
-
-	n = ij[1];
-	tmp = line + ij[1];
-	while (line[ij[1]] && !((ft_strchr(";|<>'\"", line[ij[1]])
-				|| ft_isspace(line[ij[1]]))
-			&& !sh_is_back_escape(line, ij[1] - 1)))
-		ij[1]++;
-	n = ij[1] - n;
-	if (ft_isquotation(line[ij[1]]))
-	{
-		newline[(ij[0])++] = QUOTATION;
-		sh_memcpy(newline + ij[0], tmp, n);
-		ij[0] += n;
-		newline[(ij[0])++] = OLDQUOTES;
-		if (line[ij[1]++] == '"')
-			sh_fill1(line, newline, ij);
-		else
-			sh_fill2(line, newline, ij);
-		newline[(ij[0])++] = QUOTATION;
-		return ;
-	}
-	sh_memcpy(newline + ij[0], tmp, n);
-	ij[0] += n;
-}
-
-// TODO: Find a better way to implement this withous using non printable chars.
-// Outer quotations surrounding tokens will be replace by QUOTATION which is 
-// 3 END OF TEXT (ETX), non printed back-slash will be replaced by
-// BACKSLASH which is 8	BACKSPACE (BS), printed dollar signes will be repaced by
-// 1 and non printed by 4, and old quotations will be replaced by 2.
-// sh_putstr_fd prints those chars in color.
-// It's done this way to preserve infos about the command line and fix
-// quotations at the same time. Saved infos are needed to clear back-slash 
-// characters and replace strings preceded by dollar sign `$HOME` ... .
-
-char	*sh_fix_quotations(char *line, char *newline, int ij[2])
-{
-	char		quote;
-
-	while (line[ij[1]])
-	{
-		while (line[ij[1]] && (ft_strchr(";|<>", line[ij[1]])
-				|| ft_isspace(line[ij[1]])))
-			newline[ij[0]++] = line[ij[1]++];
-		if (ft_isquotation(line[ij[1]]) && !sh_is_back_escape(line, ij[1] - 1))
-		{
-			quote = line[ij[1]++];
-			newline[ij[0]++] = QUOTATION;
-			newline[ij[0]++] = OLDQUOTES;
-			if (quote == '"')
-				sh_fill1(line, newline, ij);
-			else
-				sh_fill2(line, newline, ij);
-			newline[ij[0]++] = QUOTATION;
-		}
-		else
-			sh_fill_prequote(line, newline, ij);
-	}
-	newline[ij[0]] = '\0';
-	//sh_putstr_fd(newline, STDERR_FILENO);  //////
-	return (newline);
+	else
+		i++;
+	return (sh_recursive_check(data, line, i));
 }

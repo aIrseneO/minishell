@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 04:33:32 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/15 01:47:09 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/22 23:11:04 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@ void	prompt(int mode)
 {
 	if (mode == 0)
 		write(STDERR_FILENO, "\n\x1B[32mMinishell_> \x1B[0m", 22);
+}
+
+void	prompt2(void)
+{
+	write(STDERR_FILENO, "\x1B[34m> \x1B[0m", 11);
 }
 
 int	sh_isbackslash(char c)

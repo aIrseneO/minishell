@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 22:59:49 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/15 04:06:33 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/02/23 04:57:18 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,13 +67,22 @@ static void	sh_parse_and_execute_each_cmd(t_data *data, int n, int wstatus)
 	}
 }
 
-static void	sh_minishell(t_data *data)
+static void	sh_minishell(t_data *data, int n)
 {
 	while (1)
 	{
 		while (sh_syntax_check(data) == -1)
-			if (sh_get_line(data, 0) == -1)
+		{
+			n = get_next_line(data->fd, &data->line);
+			if (n == -1)
 				exit(sh_perror_free_t_data(strerror(errno), data));
+			if (n == 0)
+			{
+				if (!(*data->line))
+					sigexit_ctrl_d_handler(data, data->status);
+				sigappend_ctrl_d_handler(data, &data->line, n);
+			}
+		}
 		data->line1 = ft_split3(data->line, ';', sh_isquotation, sh_isbackslash);
 		if (data->line1 == NULL)
 			exit(sh_perror_free_t_data(strerror(errno), data));
@@ -95,7 +104,7 @@ int	main(int ac, char **av, char **env)
 		return (sh_perror_free_t_data(strerror(errno), &data));
 	//data.mode += !(isatty(data.fd)) * 2;
 	prompt(data.mode);
-	sh_minishell(&data);
+	sh_minishell(&data, 0);
 	return (sh_perror_free_t_data("Oops, something went wrong!", NULL));
 }
 //_ https://www.gnu.org/software/libc/manual/html_node/Resource-Usage.html
