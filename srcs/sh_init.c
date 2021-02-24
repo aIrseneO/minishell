@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	sh_reset_t_data(t_data *data)
+void		sh_reset_t_data(t_data *data)
 {
 	ft_strdel(&data->line);
 	ft_astrfree(&data->line1, free);
@@ -20,9 +20,9 @@ void	sh_reset_t_data(t_data *data)
 	sh_cmdfree(&data->cmd);
 }
 
-int	sh_init_cmd(t_cmd ***cmd, int n)
+int			sh_init_cmd(t_cmd ***cmd, int n)
 {
-	int			i;
+	int		i;
 
 	*cmd = (t_cmd **)malloc(sizeof(**cmd) * (n + 1));
 	if (*cmd == NULL)
@@ -64,11 +64,14 @@ static void	sh_get_fd_or_line(t_data *data)
 	}
 }
 
+/*
+** Set Shellpid: data->shellpid = getpid();
+*/
+
 static void	sh_zerodata_and_init_const(t_data *data, int ac, char **av)
 {
 	data->ac = ac;
 	data->av = av;
-	//data->shellpid = getpid();
 	data->fd = STDIN_FILENO;
 	data->mode = 0;
 	data->pwd = NULL;
@@ -86,7 +89,7 @@ static void	sh_zerodata_and_init_const(t_data *data, int ac, char **av)
 	data->status = 0;
 }
 
-int	sh_init(t_data *data, int ac, char **av, char **env)
+int			sh_init(t_data *data, int ac, char **av, char **env)
 {
 	sh_zerodata_and_init_const(data, ac, av);
 	if (data->envpl == NULL)

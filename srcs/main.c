@@ -40,7 +40,7 @@ static void	sh_handle_child_ps_returned_value(t_data *data, int wstatus, int n)
 
 static void	sh_parse_and_execute_each_cmd(t_data *data, int n, int wstatus)
 {
-	pid_t			father;
+	pid_t	father;
 
 	while (data->line1[n])
 	{
@@ -83,7 +83,8 @@ static void	sh_minishell(t_data *data, int n)
 				sigappend_ctrl_d_handler(data, &data->line, n);
 			}
 		}
-		data->line1 = ft_split3(data->line, ';', sh_isquotation, sh_isbackslash);
+		data->line1 = ft_split3(data->line, ';',
+						sh_isquotation, sh_isbackslash);
 		if (data->line1 == NULL)
 			exit(sh_perror_free_t_data(strerror(errno), data));
 		if (!data->line1[0])
@@ -93,21 +94,27 @@ static void	sh_minishell(t_data *data, int n)
 	}
 }
 
-int	main(int ac, char **av, char **env)
+/*
+** After Initialization set: data.mode += !(isatty(data.fd)) * 2;
+*/
+
+int			main(int ac, char **av, char **env)
 {
-	t_data			data;
+	t_data	data;
 
 	if (signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR
 		|| signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR)
 		return (sh_perror_free_t_data(strerror(errno), NULL));
 	if (sh_init(&data, ac, av, env) == -1)
 		return (sh_perror_free_t_data(strerror(errno), &data));
-	//data.mode += !(isatty(data.fd)) * 2;
 	prompt(data.mode);
 	sh_minishell(&data, 0);
 	return (sh_perror_free_t_data("Oops, something went wrong!", NULL));
 }
-//_ https://www.gnu.org/software/libc/manual/html_node/Resource-Usage.html
-//_ https://brandonwamboldt.ca/how-bash-redirection-works-under-the-hood-1512/
-//_ https://brandonwamboldt.ca/how-linux-pipes-work-under-the-hood-1518/
-//_ https://ideone.com/fedrB8
+/*
+**		Resources:
+**_ https://www.gnu.org/software/libc/manual/html_node/Resource-Usage.html
+**_ https://brandonwamboldt.ca/how-bash-redirection-works-under-the-hood-1512/
+**_ https://brandonwamboldt.ca/how-linux-pipes-work-under-the-hood-1518/
+**_ https://ideone.com/fedrB8
+*/

@@ -12,7 +12,9 @@
 
 #include "libft.h"
 
-//gw env.c libft.a -o bin/env
+/*
+** gw env.c libft.a -o bin/env
+*/
 
 int	main(int ac, char **av, char **envp)
 {
