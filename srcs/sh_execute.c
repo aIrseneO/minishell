@@ -12,19 +12,21 @@
 
 #include "minishell.h"
 
-//			Made for testing
-/*static void		sh_execvp(char *line)
-{
-	char *ag[] = {"/bin/sh", "-c", line, NULL};
-	if (!ft_strcmp(line, "exit"))
-		exit(1);
-	execvp(ag[0], ag);
-	write(STDERR_FILENO, "Oops, something went wrong!\n", 28);
-}*/
+/*
+** Made for testing
+**static void		sh_execvp(char *line)
+**{
+**	char *ag[] = {"/bin/sh", "-c", line, NULL};
+**	if (!ft_strcmp(line, "exit"))
+**		exit(1);
+**	execvp(ag[0], ag);
+**	write(STDERR_FILENO, "Oops, something went wrong!\n", 28);
+**}
+*/
 
-int	sh_execve(t_data *data, int i)
+int				sh_execve(t_data *data, int i)
 {
-	struct stat		sb;
+	struct stat	sb;
 
 	if (!data->cmd[i]->app)
 		exit(0);
@@ -47,7 +49,7 @@ int	sh_execve(t_data *data, int i)
 	return (-42);
 }
 
-void	sh_execute_recursive_pipe(t_data *data, int fd, int i, pid_t father)
+void			sh_recursive_pipe(t_data *data, int fd, int i, pid_t father)
 {
 	int			pipefd[2];
 
@@ -73,5 +75,5 @@ void	sh_execute_recursive_pipe(t_data *data, int fd, int i, pid_t father)
 	}
 	if (wait(NULL) == -1 || close(pipefd[1]) == -1)
 		sh_perror_exit(RED, NULL, strerror(errno), -1);
-	sh_execute_recursive_pipe(data, pipefd[0], i + 1, 0);
+	sh_recursive_pipe(data, pipefd[0], i + 1, 0);
 }

@@ -31,7 +31,7 @@ void	sh_perror_exit(char *s1, char *s2, char *s3, int n)
 	exit(n);
 }
 
-int	sh_perror_return(char *s1, char *s2, char *s3, int n)
+int		sh_perror_return(char *s1, char *s2, char *s3, int n)
 {
 	write(STDERR_FILENO, s1, ft_strlen(s1));
 	if (s2)
@@ -45,13 +45,13 @@ int	sh_perror_return(char *s1, char *s2, char *s3, int n)
 	return (n);
 }
 
-int	sh_perror_free_t_data(char *_errmsg, t_data *data)
+int		sh_perror_free_t_data(char *error_msg, t_data *data)
 {
-	if (_errmsg)
+	if (error_msg)
 	{
 		write(STDERR_FILENO, RED, 5);
 		write(STDERR_FILENO, "Minishell: ", 11);
-		write(STDERR_FILENO, _errmsg, ft_strlen(_errmsg));
+		write(STDERR_FILENO, error_msg, ft_strlen(error_msg));
 		write(STDERR_FILENO, RESET, 4);
 		write(STDERR_FILENO, "\n", 1);
 	}

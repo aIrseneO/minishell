@@ -12,7 +12,9 @@
 
 #include "minishell.h"
 
-// For debugging only
+/*
+** For debugging only
+*/
 
 void	sh_putstr_fd(char *s, int fd)
 {

@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	sh_check_semicolon(t_data *data, char **line, int i)
+int			sh_check_semicolon(t_data *data, char **line, int i)
 {
 	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
 	if ((*line)[i] == ';' || (*line)[i] == '|')
@@ -20,7 +20,7 @@ int	sh_check_semicolon(t_data *data, char **line, int i)
 	return (sh_recursive_check(data, line, i));
 }
 
-int	sh_check_redirection(t_data *data, char **line, int i)
+int			sh_check_redirection(t_data *data, char **line, int i)
 {
 	if (ft_isredirection((*line)[i + 1])
 		&& !ft_strncmp(*line + i++, "><", 2))
@@ -44,8 +44,10 @@ static int	sh_get_line_quotation(t_data *data, char **line, int n, char *tmp1)
 		{
 			free(*line);
 			free(tmp1);
-			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m", NULL,
-				"unexpected EOF while looking for matching `\"'", -1));
+			sh_perror_return("\x1B[33mMinishell: \x1B[0m", NULL,
+				"unexpected EOF while looking for matching `\"'", -1);
+			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
+				"syntax error", "unexpected end of file", -1));
 		}
 		sigappend_ctrl_d_handler(data, line, n);
 	}
@@ -63,8 +65,7 @@ static int	sh_get_line_to_append(t_data *data, char c, char **line, int *i)
 		prompt2();
 		tmp1 = *line;
 		if (sh_get_line_quotation(data, line, 0, tmp1) == -1)
-			return (sh_perror_return("\x1B[33mMinishell: \x1B[0m",
-				"syntax error", "unexpected end of file", -1));
+			return (-1);
 		tmp2 = *line;
 		*line = ft_strjoin2(tmp1, "\n", tmp2);
 		free(tmp1);
@@ -76,15 +77,15 @@ static int	sh_get_line_to_append(t_data *data, char c, char **line, int *i)
 		if (*line == NULL)
 			exit(sh_perror_free_t_data(strerror(errno), data));
 	}
-	*i += tmp - tmp2 + 2; 
+	*i += tmp - tmp2 + 2;
 	free(tmp2);
 	return (0);
 }
 
-int	sh_check_quotation(t_data *data, char **line, int i, char c)
+int			sh_check_quotation(t_data *data, char **line, int i, char c)
 {
-	char			*tmp;
-	char			*newline;
+	char	*tmp;
+	char	*newline;
 
 	while ((*line)[i] && !((*line)[i] == c
 				&& !(sh_is_back_escape(*line, i - 1) && c != '\'')))

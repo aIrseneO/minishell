@@ -35,7 +35,7 @@ static int	sh_export_(t_data *data, char *str)
 	return (n);
 }
 
-int	sh_update(t_data *data, int is_env[3])
+int			sh_update(t_data *data, int is_env[3])
 {
 	char	*path;
 
@@ -62,7 +62,7 @@ int	sh_update(t_data *data, int is_env[3])
 	return (0);
 }
 
-int	sh_update_envp(t_data *data, int i)
+int			sh_update_envp(t_data *data, int i)
 {
 	int		is_env[3];
 

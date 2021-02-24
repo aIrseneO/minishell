@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	sh_bad_syntax(char *s, char c)
+int			sh_bad_syntax(char *s, char c)
 {
 	write(STDERR_FILENO,
 		"\x1B[33mMinishell: \x1B[0msyntax error near unexpected token `", 56);
@@ -33,10 +33,10 @@ static int	sh_set_status_prompt_and_return(t_data *data)
 	return (-1);
 }
 
-int	sh_syntax_check(t_data *data)
+int			sh_syntax_check(t_data *data)
 {
-	int				ij[2];
-	char			*newline;
+	int		ij[2];
+	char	*newline;
 
 	if (!data->line)
 		return (-1);

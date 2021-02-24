@@ -101,18 +101,23 @@ static int	sh_change_directory(char *dir, t_data *data)
 			dir, strerror(errno), 1));
 	}
 	return (sh_update(data, dir, ishyphen));
-	dir = ft_getcwd();
-	if (dir == NULL)
-	{
-		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
-			"cd", strerror(errno), -1));
-	}
-	if (ishyphen)
-		ft_putendl_fd(dir, 1);
-	ishyphen = sh_update_env_var(data, dir);
-	free(dir);
-	return (ishyphen);
 }
+
+/*
+**}
+**	dir = ft_getcwd();
+**	if (dir == NULL)
+**	{
+**		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
+**			"cd", strerror(errno), -1));
+**	}
+**	if (ishyphen)
+**		ft_putendl_fd(dir, 1);
+**	ishyphen = sh_update_env_var(data, dir);
+**	free(dir);
+**	return (ishyphen);
+**}
+*/
 
 int			sh_cd(t_data *data, int n)
 {

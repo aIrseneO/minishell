@@ -59,7 +59,7 @@ static void	sh_parse_and_execute_each_cmd(t_data *data, int n, int wstatus)
 			if (father == -1)
 				exit(sh_perror_free_t_data(strerror(errno), data));
 			if (father == 0)
-				sh_execute_recursive_pipe(data, STDIN_FILENO, 0, 0);
+				sh_recursive_pipe(data, STDIN_FILENO, 0, 0);
 			if (wait(&wstatus) == -1)
 				exit(sh_perror_free_t_data(strerror(errno), data));
 			sh_handle_child_ps_returned_value(data, wstatus, n);

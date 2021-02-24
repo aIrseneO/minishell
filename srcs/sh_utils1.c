@@ -12,28 +12,28 @@
 
 #include "minishell.h"
 
-void	prompt(int mode)
+void		prompt(int mode)
 {
 	if (mode == 0)
 		write(STDERR_FILENO, "\n\x1B[32mMinishell_> \x1B[0m", 22);
 }
 
-void	prompt2(void)
+void		prompt2(void)
 {
 	write(STDERR_FILENO, "\x1B[34m> \x1B[0m", 11);
 }
 
-int	sh_isbackslash(char c)
+int			sh_isbackslash(char c)
 {
 	return (c == '\\' || c == BACKSLASH);
 }
 
-int	sh_isquotation(char c)
+int			sh_isquotation(char c)
 {
 	return (c == '\'' || c == '"' || c == QUOTATION || c == OLDQUOTES);
 }
 
-int	sh_is_back_escape(char *line, int i)
+int			sh_is_back_escape(char *line, int i)
 {
 	int		n;
 

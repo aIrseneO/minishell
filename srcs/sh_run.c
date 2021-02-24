@@ -12,15 +12,15 @@
 
 #include "minishell.h"
 
-// watch up for this commands: unset HOME; unset PWD
-
 static int	sh_save(t_data *data, int std_out_in[2], t_list *redirect_file[2])
 {
 	std_out_in[0] = dup(STDOUT_FILENO);
 	std_out_in[1] = dup(STDIN_FILENO);
 	if (!std_out_in[0] || !std_out_in[1])
+	{
 		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
-				"Couldn't save a STD_FILENO", strerror(errno), -1));
+			"Couldn't save a STD_FILENO", strerror(errno), -1));
+	}
 	redirect_file[0] = data->cmd[0]->redirections;
 	redirect_file[1] = data->cmd[0]->files;
 	return (0);
@@ -30,17 +30,19 @@ static int	sh_restore(t_data *data, int std_out_in[2], t_list *redrct_file[2])
 {
 	if (dup2(std_out_in[0], STDOUT_FILENO) == -1
 		|| dup2(std_out_in[1], STDIN_FILENO) == -1)
+	{
 		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
-				"Couldn't restore a STD_FILENO", strerror(errno), -1));
+			"Couldn't restore a STD_FILENO", strerror(errno), -1));
+	}
 	data->cmd[0]->redirections = redrct_file[0];
 	data->cmd[0]->files = redrct_file[1];
 	return (0);
 }
 
-int	sh_run_if_father_app(t_data *data, int n)
+int			sh_run_if_father_app(t_data *data, int n)
 {
-	int			std_out_in[2];
-	t_list		*redirections_files[2];
+	int		std_out_in[2];
+	t_list	*redirections_files[2];
 
 	if (sh_save(data, std_out_in, redirections_files) == -1)
 		return (-1);
@@ -63,7 +65,7 @@ int	sh_run_if_father_app(t_data *data, int n)
 	return (1);
 }
 
-void	sh_execute_if_father_app(t_data *data, int n)
+void		sh_execute_if_father_app(t_data *data, int n)
 {
 	if (!ft_strcmp(data->cmd[n]->app, "cd"))
 		exit(sh_cd(data, n));

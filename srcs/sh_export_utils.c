@@ -59,9 +59,11 @@ static int	sh_export_str_envpl(char *str, t_list **list, int n)
 	return (0);
 }
 
-// `n` is the number of char before `=`
+/*
+** `n` is the number of char before `=`
+*/
 
-int	sh_export_str(t_data *data, char *str, int n)
+int			sh_export_str(t_data *data, char *str, int n)
 {
 	char	**argv;
 

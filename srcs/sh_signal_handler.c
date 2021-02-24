@@ -12,19 +12,19 @@
 
 #include "minishell.h"
 
-void	sigint_ctrl_c_handler(int signum)
+void		sigint_ctrl_c_handler(int signum)
 {
 	write(STDERR_FILENO, "\n", 1);
 	prompt(0);
 	(void)signum;
 }
 
-void	sigquit_ctrl_slash_handler(int signum)
+void		sigquit_ctrl_slash_handler(int signum)
 {
 	(void)signum;
 }
 
-void	sigexit_ctrl_d_handler(t_data *data, int exno)
+void		sigexit_ctrl_d_handler(t_data *data, int exno)
 {
 	if (!data->mode)
 		write(STDERR_FILENO, "exit\n", 5);
@@ -32,9 +32,11 @@ void	sigexit_ctrl_d_handler(t_data *data, int exno)
 	exit(exno);
 }
 
-// When ctrl+d is catch, this function append new input to old one.
+/*
+** When ctrl+d is catch, this function append new input to old one.
+*/
 
-void	sigappend_ctrl_d_handler(t_data *data, char **line, int n)
+void		sigappend_ctrl_d_handler(t_data *data, char **line, int n)
 {
 	char	*tmp1;
 	char	*tmp2;

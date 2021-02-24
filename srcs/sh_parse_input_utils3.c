@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static char	*sh_get_absolute_path(char *app, t_data *data, int j)
+static char			*sh_get_absolute_path(char *app, t_data *data, int j)
 {
 	DIR				*directory;
 	struct dirent	*dir;
@@ -40,7 +40,7 @@ static char	*sh_get_absolute_path(char *app, t_data *data, int j)
 	return (app);
 }
 
-static int	sh_is_builtin(char *app)
+static int			sh_is_builtin(char *app)
 {
 	if (!ft_strcmp(app, "cd") || !ft_strcmp(app, "export")
 		|| !ft_strcmp(app, "unset") || !ft_strcmp(app, "pwd")
@@ -49,9 +49,9 @@ static int	sh_is_builtin(char *app)
 	return (0);
 }
 
-int	sh_make_absolute_path(char **app, t_data *data)
+int					sh_make_absolute_path(char **app, t_data *data)
 {
-	char	*path;
+	char			*path;
 
 	if (!data->path)
 		return (0);

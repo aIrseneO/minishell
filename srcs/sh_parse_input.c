@@ -14,7 +14,7 @@
 
 static int	sh_load_argv(char ***argv, t_list *args)
 {
-	int				i;
+	int		i;
 
 	*argv = ft_astrinit(ft_lstsize(args) + 2);
 	if (*argv == NULL)
@@ -56,13 +56,14 @@ static int	sh_update_envp_(t_data *data)
 	return (0);
 }
 
-int	sh_parse_cmds(t_data *data, int i, int m)
+int			sh_parse_cmds(t_data *data, int i, int m)
 {
-	int				j;
+	int		j;
 
 	ft_astrfree(&data->line2, free);
 	sh_cmdfree(&data->cmd);
-	data->line2 = ft_split3(data->line1[i], '|', sh_isquotation, sh_isbackslash);
+	data->line2 = ft_split3(data->line1[i], '|',
+					sh_isquotation, sh_isbackslash);
 	if (data->line2 == NULL)
 		return (-1);
 	if (sh_init_cmd(&data->cmd, ft_astrsize(data->line2)) == -1)

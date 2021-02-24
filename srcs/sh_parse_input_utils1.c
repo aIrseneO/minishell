@@ -14,8 +14,8 @@
 
 static int	sh_extract_redirections(char *line2, int *i, t_list **list)
 {
-	char			*tmp;
-	t_list			*new;
+	char	*tmp;
+	t_list	*new;
 
 	tmp = line2 + *i + 1;
 	if (*tmp && ft_isredirection(*tmp))
@@ -43,9 +43,9 @@ static int	sh_load_app(t_data *data, char **app, int isquote)
 
 static int	sh_extract_app(t_data *data, char *line2, int *i, char **app)
 {
-	char			*begin;
-	char			*end;
-	int				isquote;
+	char	*begin;
+	char	*end;
+	int		isquote;
 
 	isquote = 0;
 	if (line2[*i] == QUOTATION)
@@ -70,9 +70,10 @@ static int	sh_extract_app(t_data *data, char *line2, int *i, char **app)
 	return (sh_load_app(data, app, isquote));
 }
 
-int	sh_recursive_parse_line2(t_data *data, char *line2, int i, t_cmd *cmd)
+int			sh_recursive_parse_line2(t_data *data, char *line2,
+				int i, t_cmd *cmd)
 {
-	int			m;
+	int		m;
 
 	i = ft_isfx_ptrmove(line2 + i, ft_isspace, NULL) - line2;
 	if (!line2[i])

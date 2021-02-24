@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static void	sh_link1(char *file)
+static void		sh_link1(char *file)
 {
 	int			fd;
 
@@ -23,7 +23,7 @@ static void	sh_link1(char *file)
 		sh_perror_exit(RED, NULL, strerror(errno), 1);
 }
 
-static void	sh_link2(char *file)
+static void		sh_link2(char *file)
 {
 	int			fd;
 	struct stat	sb;
@@ -45,18 +45,19 @@ static void	sh_link2(char *file)
 		sh_perror_exit(RED, NULL, strerror(errno), 1);
 }
 
-static void	sh_link3(char *file)
+static void		sh_link3(char *file)
 {
 	int			fd;
 
-	fd = open(file, O_APPEND | O_CREAT | O_WRONLY, 0666 );
+	fd = open(file, O_APPEND | O_CREAT | O_WRONLY, 0666);
 	if (fd == -1)
 		sh_perror_exit(YEL, file, strerror(errno), 1);
 	if (dup2(fd, STDOUT_FILENO) == -1 || close(fd) == -1)
 		sh_perror_exit(RED, NULL, strerror(errno), 1);
 }
 
-void	sh_recursive_redirection(t_data *data, int i, int (*exec)(t_data*, int))
+void			sh_recursive_redirection(t_data *data, int i,
+					int (*exec)(t_data*, int))
 {
 	if (!data->cmd[i]->redirections && !data->cmd[i]->files)
 	{

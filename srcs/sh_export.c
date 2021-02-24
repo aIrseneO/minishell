@@ -106,7 +106,7 @@ static int	sh_check_and_export_str(t_data *data, char *str)
 	return (2);
 }
 
-int	sh_export(t_data *data, int i)
+int			sh_export(t_data *data, int i)
 {
 	char	**argv;
 	int		n;
@@ -125,12 +125,11 @@ int	sh_export(t_data *data, int i)
 			ft_putstr_fd(*argv, STDERR_FILENO);
 			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
 		}
-		else if (i == -1)
+		if (i == -1 || sh_update_env_var(*argv++, data) == -1)
+		{
 			return (sh_perror_return("\x1B[31mMinishell: \x1B[0m", "export",
 					strerror(errno), -1));
-		if (sh_update_env_var(*argv++, data) == -1)
-			return (sh_perror_return("\x1B[31mMinishell: \x1B[0m", "export",
-					strerror(errno), -1));
+		}
 	}
 	return (n);
 }

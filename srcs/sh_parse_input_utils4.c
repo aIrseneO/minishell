@@ -14,8 +14,8 @@
 
 static char	*sh_clean(char *str)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 
 	i = 0;
 	j = 0;
@@ -95,7 +95,7 @@ static char	*sh_replace_element(char *line, int *i, char c, t_data *data)
 	return (sh_replace(line, i, ft_strdup(""), line + *i + 1));
 }
 
-char	*sh_recursive_replace_dollar_clean(char *line, int i, t_data *data)
+char		*sh_recursive_replace_dollar_clean(char *line, int i, t_data *data)
 {
 	char	*new;
 

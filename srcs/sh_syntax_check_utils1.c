@@ -36,8 +36,8 @@ static void	sh_get_line_to_append_pipe(t_data *data, char **line, int n)
 
 static int	sh_check_pipe(t_data *data, char **line, int i)
 {
-	char			*newline;
-	char			*tmp;
+	char	*newline;
+	char	*tmp;
 
 	if ((*line)[i + 1] == '|')
 		return (sh_bad_syntax("||", 0));
@@ -50,8 +50,10 @@ static int	sh_check_pipe(t_data *data, char **line, int i)
 		tmp = ft_strjoin(*line, newline);
 		free(newline);
 		if (!tmp)
+		{
 			return (sh_perror_return("\x1B[31mMinishell: \x1B[0m", NULL,
 					strerror(errno), -1));
+		}
 		free(*line);
 		*line = tmp;
 	}
@@ -86,9 +88,11 @@ static int	sh_check_escape(t_data *data, char **line, int i, int n)
 	return (sh_recursive_check(data, line, i));
 }
 
-// TODO: Implement "&()". & -> for jobs
+/*
+** TODO: Implement "&()". & -> for jobs
+*/
 
-int	sh_recursive_check(t_data *data, char **line, int i)
+int			sh_recursive_check(t_data *data, char **line, int i)
 {
 	if (!(*line)[i])
 		return (1);

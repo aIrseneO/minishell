@@ -55,7 +55,7 @@ static void	sh_removep(t_list **list, char *argv, int *isremoved)
 	tmp2->next = tmp1;
 }
 
-int	sh_unset(t_data *data, int i)
+int			sh_unset(t_data *data, int i)
 {
 	int		isremoved;
 	char	**argv;
@@ -71,8 +71,10 @@ int	sh_unset(t_data *data, int i)
 		return (0);
 	argv = ft_lsttoastr(*data->envpl);
 	if (argv == NULL && *data->envpl)
+	{
 		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m", "unset",
-				strerror(errno), 1));
+			strerror(errno), 1));
+	}
 	free(data->envp);
 	data->envp = argv;
 	return (0);

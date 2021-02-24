@@ -41,11 +41,11 @@ static int	sh_add_back1(t_data *data, t_list **list, t_list *new, int isquote)
 	return (0);
 }
 
-int	sh_extract_file(t_data *data, char *line2, int *i, t_list **list)
+int			sh_extract_file(t_data *data, char *line2, int *i, t_list **list)
 {
-	char			*begin;
-	char			*end;
-	int				isquote;
+	char	*begin;
+	char	*end;
+	int		isquote;
 
 	isquote = 0;
 	if (line2[*i] == QUOTATION)
@@ -84,11 +84,11 @@ static int	sh_add_back2(t_data *data, t_list **list, t_list *new, int isquote)
 	return (0);
 }
 
-int	sh_extract_args(t_data *data, char *line2, int *i, t_list **list)
+int			sh_extract_args(t_data *data, char *line2, int *i, t_list **list)
 {
-	char			*begin;
-	char			*end;
-	int				isquote;
+	char	*begin;
+	char	*end;
+	int		isquote;
 
 	isquote = 0;
 	if (line2[*i] == QUOTATION)

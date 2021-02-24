@@ -12,9 +12,17 @@
 
 #include "minishell.h"
 
-int	sh_exit(t_data *data, int i)
+static void	sh_put_free(t_data *data, int i)
 {
-	int	exno;
+	ft_putstr_fd("\x1B[33mMinishell: \x1B[0mexit: ", STDERR_FILENO);
+	ft_putstr_fd(data->cmd[i]->argv[1], STDERR_FILENO);
+	ft_putendl_fd(": numeric argument required", STDERR_FILENO);
+	sh_free_t_data(data);
+}
+
+int			sh_exit(t_data *data, int i)
+{
+	int		exno;
 
 	if (data->mode == 0)
 		write(STDERR_FILENO, "exit\n", 5);
@@ -26,15 +34,14 @@ int	sh_exit(t_data *data, int i)
 	}
 	if (!ft_isnumber(data->cmd[i]->argv[1]))
 	{
-		ft_putstr_fd("\x1B[33mMinishell: \x1B[0mexit: ", STDERR_FILENO);
-		ft_putstr_fd(data->cmd[i]->argv[1], STDERR_FILENO);
-		ft_putendl_fd(": numeric argument required", STDERR_FILENO);
-		sh_free_t_data(data);
+		sh_put_free(data, i);
 		exit(2);
 	}
 	if (data->cmd[i]->argv[2])
+	{
 		return (sh_perror_return("\x1B[33mMinishell: \x1B[0m", "exit",
 				"too many arguments", 1));
+	}
 	exno = ft_atoi(data->cmd[i]->argv[1]);
 	sh_free_t_data(data);
 	exit((unsigned char)exno);
