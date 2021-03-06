@@ -15,7 +15,7 @@
 void		prompt(int mode)
 {
 	if (mode == 0)
-		write(STDERR_FILENO, "\n\x1B[32mMinishell_> \x1B[0m", 22);
+		write(STDERR_FILENO, "\x1B[32mMinishell_> \x1B[0m", 21);
 }
 
 void		prompt2(void)

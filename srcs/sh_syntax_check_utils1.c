@@ -19,7 +19,7 @@ static void	sh_get_line_to_append_pipe(t_data *data, char **line, int n)
 		prompt2();
 		n = get_next_line(data->fd, line);
 		if (n == -1)
-			exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 		else if (n == 0)
 		{
 			if (!(**line))
@@ -77,11 +77,11 @@ static int	sh_check_escape(t_data *data, char **line, int i, int n)
 		(*line)[--i] = '\0';
 		prompt2();
 		if (get_next_line(data->fd, &newline) == -1)
-			exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 		tmp = ft_strjoin(*line, newline);
 		free(newline);
 		if (!tmp)
-			exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 		free(*line);
 		*line = tmp;
 	}
@@ -89,7 +89,7 @@ static int	sh_check_escape(t_data *data, char **line, int i, int n)
 }
 
 /*
-** TODO: Implement "&()". & -> for jobs
+** TODO: Implement `&()` (& -> for jobs)
 */
 
 int			sh_recursive_check(t_data *data, char **line, int i)

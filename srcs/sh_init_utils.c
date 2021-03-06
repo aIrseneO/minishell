@@ -35,7 +35,7 @@ static int	sh_export_(t_data *data, char *str)
 	return (n);
 }
 
-int			sh_update(t_data *data, int is_env[3])
+static int	sh_update(t_data *data, int is_env[3])
 {
 	char	*path;
 
@@ -62,7 +62,7 @@ int			sh_update(t_data *data, int is_env[3])
 	return (0);
 }
 
-int			sh_update_envp(t_data *data, int i)
+void		sh_update_envp(t_data *data, int i)
 {
 	int		is_env[3];
 
@@ -79,5 +79,6 @@ int			sh_update_envp(t_data *data, int i)
 			is_env[2] = i;
 		i++;
 	}
-	return (sh_update(data, is_env));
+	if (sh_update(data, is_env) == -1)
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
 }

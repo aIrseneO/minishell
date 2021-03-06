@@ -12,8 +12,9 @@
 
 NAME = minishell
 
-SRCS = main.c sh_signal_handler.c sh_error_free_exit.c \
+SRCS = main.c sh_error_free_exit.c \
 	sh_utils1.c sh_utils2.c \
+	sh_signal_handler.c sh_signal_handler_utils.c \
 	sh_init.c sh_init_utils.c \
 	sh_parse_input.c sh_parse_input_utils1.c sh_parse_input_utils2.c \
 	sh_parse_input_utils3.c sh_parse_input_utils4.c \
@@ -31,11 +32,11 @@ OBJS_BIN	= $(subst .c,.o,$(SRCS_BIN))
 BIN			= bin
 BIN_PATH	= $(PWD)/$(BIN)
 
-CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS		= -Wall -Wextra -Werror #-g -fsanitize=address
 
 LIBFT		= libft.a
 
-all:		$(NAME) bin
+all:		$(NAME) bin_dir bin
 
 $(NAME):	$(OBJS)	$(LIBFT)
 			$(CC) $(CFLAGS) -o $@ $^
@@ -50,7 +51,7 @@ $(LIBFT):
 $(BIN)/%:	%.o $(LIBFT)
 				$(CC) -I libft $(CFLAGS) -o $@ $^
 
-bin:		$(BIN)/echo $(BIN)/env $(BIN)/pwd
+bin:		bin_dir $(BIN)/echo $(BIN)/env $(BIN)/pwd
 
 path:
 			@bash -c "if grep _BIN_PATH_ $(HEADER); \
@@ -58,6 +59,9 @@ path:
 
 nopath:
 			/bin/sed -i "s|PATH=.*|PATH=_BIN_PATH_\"|g" $(HEADER)
+
+bin_dir:
+			@bash -c "if [ ! -d ./bin ]; then mkdir bin; fi"
 
 clean:
 			/bin/rm -f $(OBJS) $(OBJS_BIN)

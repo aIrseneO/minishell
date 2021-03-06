@@ -12,15 +12,12 @@
 
 #include "minishell.h"
 
-static void	sh_handle_child_ps_returned_value(t_data *data, int wstatus, int n)
+static void	sh_handle_last_child_ps_returned_value(t_data *data,
+				int wstatus, int n)
 {
-	if (wstatus == -1)
-		sh_perror_exit(NULL, NULL, "Child poccess faillure", -1);
 	if (WIFEXITED(wstatus))
 	{
 		data->status = WEXITSTATUS(wstatus);
-		if (data->status == -1)
-			write(STDERR_FILENO, "\x1B[31mFailled\x1B[0m\n", 17);
 		if (!data->line1[n])
 			prompt(data->mode);
 	}
@@ -38,78 +35,72 @@ static void	sh_handle_child_ps_returned_value(t_data *data, int wstatus, int n)
 	}
 }
 
-static void	sh_parse_and_execute_each_cmd(t_data *data, int n, int wstatus)
-{
-	pid_t	father;
+/*
+** Bash doesn't display anything from intermediate pipes, this can be seen
+** when running a `cat | echo` in Bash, sending SIGINT or SIGQUIT doesn't
+** display anything
+*/
 
-	while (data->line1[n])
-	{
-		wstatus = sh_parse_cmds(data, n++, 0);
-		if (wstatus == -1)
-			exit(sh_perror_free_t_data(strerror(errno), data));
-		if (wstatus == 2)
-			break ;
-		if (!data->line2[1] && data->cmd[0]->app)
-			wstatus = sh_run_if_father_app(data, n);
-		if (wstatus == -1)
-			sh_perror_exit(RED, NULL, strerror(errno), -1);
-		if (wstatus == 0)
-		{
-			father = fork();
-			if (father == -1)
-				exit(sh_perror_free_t_data(strerror(errno), data));
-			if (father == 0)
-				sh_recursive_pipe(data, STDIN_FILENO, 0, 0);
-			if (wait(&wstatus) == -1)
-				exit(sh_perror_free_t_data(strerror(errno), data));
-			sh_handle_child_ps_returned_value(data, wstatus, n);
-		}
-	}
+static void	sh_wait_and_handle_intermediate_pipes_returned_values(t_data *data)
+{
+	while (data->ispiped >= 0)
+		if (waitpid(data->children_pid[data->ispiped--], NULL, 0) == -1)
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 }
 
-static void	sh_minishell(t_data *data, int n)
+static void	sh_parse_and_execute_each_cmd(t_data *data, int n)
 {
-	while (1)
+	int		wstatus;
+
+	if (signal(SIGINT, sig_handler1) == SIG_ERR ||
+			signal(SIGQUIT, sig_handler2) == SIG_ERR)
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+	while (data->line1[n])
 	{
-		while (sh_syntax_check(data) == -1)
+		if (sh_parse_cmds(data, n++))
+			break ;
+		if (!(!data->ispiped && data->cmd[0]->app
+						&& sh_run_if_non_binary(data, n)))
 		{
-			n = get_next_line(data->fd, &data->line);
-			if (n == -1)
-				exit(sh_perror_free_t_data(strerror(errno), data));
-			if (n == 0)
-			{
-				if (!(*data->line))
-					sigexit_ctrl_d_handler(data, data->status);
-				sigappend_ctrl_d_handler(data, &data->line, n);
-			}
+			sh_execute_pipes(data, STDIN_FILENO, 0);
+			if (waitpid(data->children_pid[data->ispiped--], &wstatus, 0) == -1)
+				sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_wait_and_handle_intermediate_pipes_returned_values(data);
+			sh_handle_last_child_ps_returned_value(data, wstatus, n);
 		}
-		data->line1 = ft_split3(data->line, ';',
-						sh_isquotation, sh_isbackslash);
-		if (data->line1 == NULL)
-			exit(sh_perror_free_t_data(strerror(errno), data));
-		if (!data->line1[0])
-			prompt(data->mode);
-		sh_parse_and_execute_each_cmd(data, 0, 0);
-		sh_reset_t_data(data);
 	}
 }
 
 /*
-** After Initialization set: data.mode += !(isatty(data.fd)) * 2;
+** After Initialization set: (`isatty` isn't allow for this project)
+** data.mode += !(isatty(data.fd)) * 2;
 */
 
 int			main(int ac, char **av, char **env)
 {
 	t_data	data;
 
-	if (signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR
-		|| signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR)
-		return (sh_perror_free_t_data(strerror(errno), NULL));
-	if (sh_init(&data, ac, av, env) == -1)
-		return (sh_perror_free_t_data(strerror(errno), &data));
+	sh_init(&data, ac, av, env);
 	prompt(data.mode);
-	sh_minishell(&data, 0);
-	return (sh_perror_free_t_data("Oops, something went wrong!", NULL));
+	while (1)
+	{
+		if (signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR ||
+				signal(SIGQUIT, sigquit_ctrl_slash_handler) == SIG_ERR)
+			sh_free_data_exit1(&data, NULL, strerror(errno), -1);
+		sh_get_command_line(&data, 0);
+		data.line1 = ft_split3(data.line, ';',
+						sh_isquotation, sh_isbackslash);
+		if (data.line1 == NULL)
+			sh_free_data_exit1(&data, NULL, strerror(errno), -1);
+		if (!data.line1[0])
+			prompt(data.mode);
+		else
+			sh_parse_and_execute_each_cmd(&data, 0);
+		sh_reset_t_data(&data);
+	}
+	sh_free_t_data(&data);
+	return (sh_perror_return("Oops, something went wrong!", NULL,
+			strerror(errno), -1));
 }
 /*
 **		Resources:

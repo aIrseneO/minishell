@@ -12,23 +12,40 @@
 
 #include "minishell.h"
 
-void	sh_perror_exit(char *s1, char *s2, char *s3, int n)
+void	sh_free_data_exit1(t_data *data, char *s1, char *s2, int exno)
 {
+	write(STDERR_FILENO, RED, 5);
+	write(STDERR_FILENO, "Minishell: ", 11);
+	write(STDERR_FILENO, RESET, 4);
 	if (s1)
 	{
 		write(STDERR_FILENO, s1, ft_strlen(s1));
-		write(STDERR_FILENO, "Minishell: ", 11);
-		write(STDERR_FILENO, RESET, 5);
-	}
-	if (s2)
-	{
-		write(STDERR_FILENO, s2, ft_strlen(s2));
 		write(STDERR_FILENO, ": ", 2);
 	}
-	if (s3)
-		write(STDERR_FILENO, s3, ft_strlen(s3));
+	if (s2)
+		write(STDERR_FILENO, s2, ft_strlen(s2));
 	write(STDERR_FILENO, "\n", 1);
-	exit(n);
+	if (data)
+		sh_free_t_data(data);
+	exit(exno);
+}
+
+void	sh_free_data_exit2(t_data *data, char *s1, char *s2, int exno)
+{
+	write(STDERR_FILENO, YEL, 5);
+	write(STDERR_FILENO, "Minishell: ", 11);
+	write(STDERR_FILENO, RESET, 4);
+	if (s1)
+	{
+		write(STDERR_FILENO, s1, ft_strlen(s1));
+		write(STDERR_FILENO, ": ", 2);
+	}
+	if (s2)
+		write(STDERR_FILENO, s2, ft_strlen(s2));
+	write(STDERR_FILENO, "\n", 1);
+	if (data)
+		sh_free_t_data(data);
+	exit(exno);
 }
 
 int		sh_perror_return(char *s1, char *s2, char *s3, int n)
@@ -43,21 +60,6 @@ int		sh_perror_return(char *s1, char *s2, char *s3, int n)
 		write(STDERR_FILENO, s3, ft_strlen(s3));
 	write(STDERR_FILENO, "\n", 1);
 	return (n);
-}
-
-int		sh_perror_free_t_data(char *error_msg, t_data *data)
-{
-	if (error_msg)
-	{
-		write(STDERR_FILENO, RED, 5);
-		write(STDERR_FILENO, "Minishell: ", 11);
-		write(STDERR_FILENO, error_msg, ft_strlen(error_msg));
-		write(STDERR_FILENO, RESET, 4);
-		write(STDERR_FILENO, "\n", 1);
-	}
-	if (data)
-		sh_free_t_data(data);
-	return (errno);
 }
 
 void	sh_cmdfree(t_cmd ***cmd)
@@ -88,6 +90,7 @@ void	sh_free_t_data(t_data *data)
 	free(data->line);
 	ft_astrfree(&data->line1, free);
 	ft_astrfree(&data->line2, free);
+	free(data->children_pid);
 	ft_lstclear(data->envpl, free);
 	free(data->envpl);
 	free(data->envp);

@@ -37,7 +37,7 @@ static int	sh_get_line_quotation(t_data *data, char **line, int n, char *tmp1)
 {
 	n = get_next_line(data->fd, line);
 	if (n == -1)
-		exit(sh_perror_free_t_data(strerror(errno), data));
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
 	if (n == 0)
 	{
 		if (!(**line))
@@ -75,7 +75,7 @@ static int	sh_get_line_to_append(t_data *data, char c, char **line, int *i)
 		*i += ft_strlen(tmp2) + 1;
 		free(tmp2);
 		if (*line == NULL)
-			exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 	}
 	*i += tmp - tmp2 + 2;
 	free(tmp2);
@@ -98,7 +98,7 @@ int			sh_check_quotation(t_data *data, char **line, int i, char c)
 		tmp = ft_strjoin2(NULL, *line, newline);
 		free(newline);
 		if (!tmp)
-			exit(sh_perror_free_t_data(strerror(errno), data));
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 		free(*line);
 		*line = tmp;
 	}

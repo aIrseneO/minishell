@@ -73,25 +73,22 @@ static int	sh_extract_app(t_data *data, char *line2, int *i, char **app)
 int			sh_recursive_parse_line2(t_data *data, char *line2,
 				int i, t_cmd *cmd)
 {
-	int		m;
-
 	i = ft_isfx_ptrmove(line2 + i, ft_isspace, NULL) - line2;
 	if (!line2[i])
 		return (0);
 	if (ft_isredirection(line2[i]) && !(sh_is_back_escape(line2, i - 1)))
 	{
 		if (sh_extract_redirections(line2, &i, &cmd->redirections) == -1)
-			return (-1);
-		m = sh_extract_file(data, line2, &i, &cmd->files);
-		if (m != 0)
-			return (m);
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		if (sh_extract_file(data, line2, &i, &cmd->files))
+			return (1);
 	}
 	else if (cmd->app)
 	{
 		if (sh_extract_args(data, line2, &i, &cmd->args) == -1)
-			return (-1);
+			sh_free_data_exit1(data, NULL, strerror(errno), -1);
 	}
 	else if (sh_extract_app(data, line2, &i, &cmd->app) == -1)
-		return (-1);
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
 	return (sh_recursive_parse_line2(data, line2, i, cmd));
 }

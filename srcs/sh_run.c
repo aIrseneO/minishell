@@ -12,60 +12,39 @@
 
 #include "minishell.h"
 
-static int	sh_save(t_data *data, int std_out_in[2], t_list *redirect_file[2])
+static void	sh_run(t_data *data, int (*run)(t_data*, int))
 {
-	std_out_in[0] = dup(STDOUT_FILENO);
-	std_out_in[1] = dup(STDIN_FILENO);
-	if (!std_out_in[0] || !std_out_in[1])
-	{
-		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
-			"Couldn't save a STD_FILENO", strerror(errno), -1));
-	}
-	redirect_file[0] = data->cmd[0]->redirections;
-	redirect_file[1] = data->cmd[0]->files;
-	return (0);
+	t_list	*save_redirections_files[2];
+
+	save_redirections_files[0] = data->cmd[0]->redirections;
+	save_redirections_files[1] = data->cmd[0]->files;
+	sh_recursive_redirection(data, 0, run);
+	data->cmd[0]->redirections = save_redirections_files[0];
+	data->cmd[0]->files = save_redirections_files[1];
+	if (sh_restore_std_fileno(data->std_fileno) == -1)
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
 }
 
-static int	sh_restore(t_data *data, int std_out_in[2], t_list *redrct_file[2])
+int			sh_run_if_non_binary(t_data *data, int n)
 {
-	if (dup2(std_out_in[0], STDOUT_FILENO) == -1
-		|| dup2(std_out_in[1], STDIN_FILENO) == -1)
-	{
-		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m",
-			"Couldn't restore a STD_FILENO", strerror(errno), -1));
-	}
-	data->cmd[0]->redirections = redrct_file[0];
-	data->cmd[0]->files = redrct_file[1];
-	return (0);
-}
-
-int			sh_run_if_father_app(t_data *data, int n)
-{
-	int		std_out_in[2];
-	t_list	*redirections_files[2];
-
-	if (sh_save(data, std_out_in, redirections_files) == -1)
-		return (-1);
 	if (!ft_strcmp(data->cmd[0]->app, "cd"))
-		sh_recursive_redirection(data, 0, sh_cd);
+		sh_run(data, sh_cd);
 	else if (!ft_strcmp(data->cmd[0]->app, "export"))
-		sh_recursive_redirection(data, 0, sh_export);
+		sh_run(data, sh_export);
 	else if (!ft_strcmp(data->cmd[0]->app, "unset"))
-		sh_recursive_redirection(data, 0, sh_unset);
+		sh_run(data, sh_unset);
 	else if (!ft_strcmp(data->cmd[0]->app, "exit"))
-		sh_recursive_redirection(data, 0, sh_exit);
+		sh_run(data, sh_exit);
 	else if (!ft_strcmp(data->cmd[0]->app, "pwd"))
-		sh_recursive_redirection(data, 0, sh_pwd);
+		sh_run(data, sh_pwd);
 	else
 		return (0);
-	if (sh_restore(data, std_out_in, redirections_files) == -1)
-		return (-1);
 	if (!data->line1[n])
 		prompt(data->mode);
 	return (1);
 }
 
-void		sh_execute_if_father_app(t_data *data, int n)
+void		sh_execute_if_non_binary(t_data *data, int n)
 {
 	if (!ft_strcmp(data->cmd[n]->app, "cd"))
 		exit(sh_cd(data, n));

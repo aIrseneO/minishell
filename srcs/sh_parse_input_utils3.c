@@ -30,7 +30,7 @@ static char			*sh_get_absolute_path(char *app, t_data *data, int j)
 				if (!ft_strcmp(dir->d_name, app))
 				{
 					closedir(directory);
-					return (ft_strjoin2(data->path[j], "/", dir->d_name));
+					return (ft_strjoin2(data->path[j], "/", app));
 				}
 			}
 			closedir(directory);

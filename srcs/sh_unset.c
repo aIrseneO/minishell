@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static void	sh_update_env_var(char *argv, t_data *data)
+static void	sh_update_env_var(t_data *data, char *argv)
 {
 	if (!ft_strcmp(argv, "PATH"))
 		ft_astrfree(&data->path, free);
@@ -28,13 +28,14 @@ static void	sh_update_env_var(char *argv, t_data *data)
 	}
 }
 
-static void	sh_removep(t_list **list, char *argv, int *isremoved)
+static void	sh_removep(t_data *data, char *argv, int *isremoved)
 {
 	t_list	*tmp1;
 	t_list	*tmp2;
 
-	tmp1 = *list;
-	tmp2 = *list;
+	sh_update_env_var(data, argv);
+	tmp1 = *data->envpl;
+	tmp2 = *data->envpl;
 	while (tmp1 && ft_strncmp(tmp1->content, argv, ft_strlen(argv)))
 	{
 		tmp2 = tmp1;
@@ -43,11 +44,11 @@ static void	sh_removep(t_list **list, char *argv, int *isremoved)
 	if (!tmp1)
 		return ;
 	*isremoved = 1;
-	if (tmp1 == *list)
+	if (tmp1 == *data->envpl)
 	{
 		tmp2 = tmp1->next;
 		ft_lstdelone(tmp1, free);
-		*list = tmp2;
+		*data->envpl = tmp2;
 		return ;
 	}
 	tmp1 = tmp2->next->next;
@@ -55,27 +56,37 @@ static void	sh_removep(t_list **list, char *argv, int *isremoved)
 	tmp2->next = tmp1;
 }
 
+static void	sh_puterr_set_n(char *argv, int *n)
+{
+	*n = 1;
+	ft_putstr_fd("\x1B[33mMinishell: \x1B[0munset: `", STDERR_FILENO);
+	ft_putstr_fd(argv, STDERR_FILENO);
+	ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
+}
+
 int			sh_unset(t_data *data, int i)
 {
+	int		n;
 	int		isremoved;
 	char	**argv;
 
+	n = 0;
 	isremoved = 0;
 	argv = data->cmd[i]->argv + 1;
 	while (*argv)
 	{
-		sh_update_env_var(*argv, data);
-		sh_removep(data->envpl, *argv++, &isremoved);
+		if (!ft_isname(*argv))
+			sh_puterr_set_n(*argv, &n);
+		else
+			sh_removep(data, *argv, &isremoved);
+		argv++;
 	}
 	if (!isremoved)
-		return (0);
+		return (n);
 	argv = ft_lsttoastr(*data->envpl);
 	if (argv == NULL && *data->envpl)
-	{
-		return (sh_perror_return("\x1B[31mMinishell: \x1B[0m", "unset",
-			strerror(errno), 1));
-	}
+		sh_free_data_exit1(data, NULL, strerror(errno), -1);
 	free(data->envp);
 	data->envp = argv;
-	return (0);
+	return (n);
 }
