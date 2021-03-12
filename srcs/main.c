@@ -48,10 +48,10 @@ static void	sh_wait_and_handle_intermediate_pipes_returned_values(t_data *data)
 		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	while (data->ispiped >= 0)
 	{
-		if (waitpid(data->children_pid[data->ispiped--], NULL, 0) == -1)
-			sh_free_data_exit1(data, &wstatus, strerror(errno), X);
-		if (WIFEXITED(wstatus) && WEXISTATUS(wstatus) == X)
-			sh_free_data_exit1(data, &wstatus, strerror(errno), X);
+		if (waitpid(data->children_pid[data->ispiped--], &wstatus, 0) == -1)
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
+		if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == X)
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 	}
 }
 
@@ -105,7 +105,7 @@ int			main(int ac, char **av, char **env)
 
 	sh_init(&data, ac, av, env);
 	prompt(data.mode);
-	dataptr = &data;
+	g_dataptr = &data;
 	while (1)
 	{
 		if (signal(SIGINT, sigint_ctrl_c_handler) == SIG_ERR ||
