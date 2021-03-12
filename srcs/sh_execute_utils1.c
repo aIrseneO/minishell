@@ -6,13 +6,14 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 23:49:51 by atemfack          #+#    #+#             */
-/*   Updated: 2021/03/12 00:14:06 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/12 08:34:16 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char			*sh_get_absolute_path(char *app, t_data *data, int j)
+static char			*sh_get_absolute_path(char *app, t_data *data, int j,
+						int *iscmd)
 {
 	DIR				*directory;
 	struct dirent	*dir;
@@ -30,6 +31,7 @@ static char			*sh_get_absolute_path(char *app, t_data *data, int j)
 				if (!ft_strcmp(dir->d_name, app))
 				{
 					closedir(directory);
+					*iscmd = 1;
 					return (ft_strjoin2(data->path[j], "/", app));
 				}
 			}
@@ -37,8 +39,7 @@ static char			*sh_get_absolute_path(char *app, t_data *data, int j)
 		}
 		j++;
 	}
-	sh_free_data_exit2(data, app, "command not found", 127);
-	return (NULL);
+	return (ft_strdup(app));
 }
 
 static void			sh_update_path(t_data *data, int i, char *path)
@@ -49,22 +50,27 @@ static void			sh_update_path(t_data *data, int i, char *path)
 	data->cmd[i]->argv[0] = path;
 }
 
-void				sh_check_and_update_path(t_data *data, int i, char *app)
+void				sh_check_and_update_path(t_data *data, int i,
+						char *app, int *iscmd)
 {
+	*iscmd = 0;
 	if (*app == '.' || *app == '/' || !data->path)
 		sh_update_path(data, i, ft_strdup(app));
 	else
-		sh_update_path(data, i, sh_get_absolute_path(app, data, 0));
+		sh_update_path(data, i, sh_get_absolute_path(app, data, 0, iscmd));
 }
 
 /*
 ** There is more to handle here in order to mimic bash
 */
 
-void				sh_handle_execve_error(t_data *data, int i, char *app)
+void				sh_handle_execve_error(t_data *data, int i,
+						char *app, int iscmd)
 {
 	struct stat		sb;
 
+	if (data->path && !iscmd)
+		sh_free_data_exit2(data, app, "command not found", 127);
 	if (stat(app, &sb) == -1)
 		sh_free_data_exit2(data, app, "No such file or directory", 127);
 	if (S_ISDIR(sb.st_mode))

@@ -6,7 +6,7 @@
 #*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        *#
 #*                                                +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/30 15:21:51 by atemfack          #+#    #+#             *#
-#*   Updated: 2021/03/12 04:23:56 by atemfack         ###   ########.fr       *#
+#*   Updated: 2021/03/12 08:41:15 by atemfack         ###   ########.fr       *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
@@ -43,7 +43,7 @@ $(NAME):	$(OBJS)	$(LIBFT)
 %.o:		srcs/%.c $(HEADER)
 			$(CC) -I includes -I libft -c $(CFLAGS) -o $@ $<
 
-$(LIBFT):	libft
+$(LIBFT):
 			@$(MAKE) f --no-print-directory -C libft
 			@/bin/mv -f libft/$(LIBFT) .
 

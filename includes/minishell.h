@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/03/12 00:10:40 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/12 08:33:32 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # define WHT		"\x1B[37m"
 # define RESET		"\x1B[0m"
 # define PATH_MAX	4096
-# define PATH_ENV	"PATH=_BIN_PATH_"
+# define PATH_ENV	"PATH=/home/facko/minishell/bin"
 
 # define DOLLARSIG	1
 # define QUOTATION	3
@@ -121,8 +121,10 @@ void			sh_free_data_exit2(t_data *data, char *s1, char *s2, int exno);
 int				sh_perror_return(char *s1, char *s2, char *s3, int n);
 
 int				sh_execve(t_data *data, int i);
-void			sh_check_and_update_path(t_data *data, int i, char *app);
-void			sh_handle_execve_error(t_data *data, int i, char *app);
+void			sh_check_and_update_path(t_data *data, int i,
+					char *app, int *iscmd);
+void			sh_handle_execve_error(t_data *data, int i,
+					char *app, int iscmd);
 void			sh_execute_pipes(t_data *data, int fd, int i);
 void			sh_recursive_redirection(t_data *data, int i,
 					int (*exc)(t_data*, int));

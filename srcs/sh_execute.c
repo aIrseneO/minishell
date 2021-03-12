@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:51:22 by atemfack          #+#    #+#             */
-/*   Updated: 2021/03/12 00:13:28 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/12 08:32:46 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 
 int				sh_execve(t_data *data, int i)
 {
+	int			iscmd;
+
 	if (!data->cmd[i]->app)
 		exit(0);
 	if (!ft_strcmp(data->cmd[i]->app, "."))
@@ -37,9 +39,9 @@ int				sh_execve(t_data *data, int i)
 		exit(2);
 	}
 	sh_execute_if_non_binary(data, i);
-	sh_check_and_update_path(data, i, data->cmd[i]->app);
+	sh_check_and_update_path(data, i, data->cmd[i]->app, &iscmd);
 	if (execve(data->cmd[i]->argv[0], data->cmd[i]->argv, data->envp) == -1)
-		sh_handle_execve_error(data, i, data->cmd[i]->app);
+		sh_handle_execve_error(data, i, data->cmd[i]->app, iscmd);
 	write(STDERR_FILENO, "Oops, something went wrong!\n", 28);
 	return (-1);
 }
