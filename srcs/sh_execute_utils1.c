@@ -51,10 +51,10 @@ static void			sh_update_path(t_data *data, int i, char *path)
 
 void				sh_check_and_update_path(t_data *data, int i, char *app)
 {
-	if (*app == '.' || *app == '/' || !data->path) 
+	if (*app == '.' || *app == '/' || !data->path)
 		sh_update_path(data, i, ft_strdup(app));
 	else
-		sh_update_path(data, i , sh_get_absolute_path(app, data, 0));
+		sh_update_path(data, i, sh_get_absolute_path(app, data, 0));
 }
 
 /*

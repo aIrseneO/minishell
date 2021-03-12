@@ -20,7 +20,8 @@ int			sh_check_semicolon(t_data *data, char **line, int i)
 	return (sh_recursive_check(data, line, i));
 }
 
-static int	sh_get_line_quotation(t_data *data, char **newline, int n, char *tmp1)
+static int	sh_get_line_quotation(t_data *data, char **newline,
+			int n, char *tmp1)
 {
 	n = get_next_line(data->fd, newline);
 	if (n == -1)
@@ -79,7 +80,7 @@ static void	sh_update_line(t_data *data, char *newline, int *i, int flag)
 		tmp = ft_strjoin2(NULL, data->line, newline + 1);
 		*i -= 2;
 	}
-	else	
+	else
 		tmp = ft_strjoin2(NULL, data->line, newline);
 	free(newline);
 	if (!tmp)
@@ -89,7 +90,7 @@ static void	sh_update_line(t_data *data, char *newline, int *i, int flag)
 }
 
 /*
-** The flag is for the case: 
+** The flag is for the case:
 ** Minishell_> echo "\
 ** > no new line will be output"
 ** no new line will be output
@@ -110,7 +111,7 @@ int			sh_check_quotation(t_data *data, char **line, int i, char c)
 			flag = i - 1;
 		newline = NULL;
 		if (sh_get_line_to_append(data, c, &newline, &i) == -1)
-			return (-1);	
+			return (-1);
 		sh_update_line(data, newline, &i, flag);
 	}
 	else

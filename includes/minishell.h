@@ -103,7 +103,7 @@ typedef struct	s_data
 	int			status;
 }				t_data;
 
-t_data			*dataptr;
+t_data			*g_dataptr;
 
 void			prompt(int mode);
 void			prompt2(void);

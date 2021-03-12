@@ -15,7 +15,7 @@
 void		sigint_ctrl_c_handler(int signum)
 {
 	write(STDERR_FILENO, "\n", 1);
-	dataptr->status = 130;
+	g_dataptr->status = 130;
 	prompt(0);
 	(void)signum;
 }

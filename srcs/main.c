@@ -33,11 +33,10 @@ static void	sh_handle_last_child_ps_returned_value(t_data *data,
 	}
 	if (!data->line1[*n])
 		prompt(data->mode);
-
 }
 
 /*
-** In:`cat | echo`, `cat` is run in the intermediate process. 
+** In:`cat | echo`, `cat` is run in the intermediate process.
 */
 
 static void	sh_wait_and_handle_intermediate_pipes_returned_values(t_data *data)

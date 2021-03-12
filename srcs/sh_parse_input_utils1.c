@@ -36,8 +36,6 @@ static int	sh_load_app(t_data *data, char **app, int isquote)
 		return (-1);
 	if (**app == '\0' && !isquote)
 		ft_strdel(app);
-	//else if (sh_make_absolute_path(app, data) == -1)
-	//	return (-1);
 	return (0);
 }
 
