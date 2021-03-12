@@ -6,7 +6,7 @@
 #*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        *#
 #*                                                +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/30 15:21:51 by atemfack          #+#    #+#             *#
-#*   Updated: 2021/03/11 05:59:04 by atemfack         ###   ########.fr       *#
+#*   Updated: 2021/03/12 04:23:56 by atemfack         ###   ########.fr       *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
@@ -31,12 +31,11 @@ SRCS_BIN	= echo.c env.c pwd.c
 OBJS_BIN	= $(subst .c,.o,$(SRCS_BIN))
 BIN			= bin
 BIN_PATH	= $(PWD)/$(BIN)
-
 CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
 
 LIBFT		= libft.a
 
-all:		$(NAME) bin_dir bin
+all:		libft path $(NAME) bin_dir bin
 
 $(NAME):	$(OBJS)	$(LIBFT)
 			$(CC) $(CFLAGS) -o $@ $^
@@ -44,9 +43,12 @@ $(NAME):	$(OBJS)	$(LIBFT)
 %.o:		srcs/%.c $(HEADER)
 			$(CC) -I includes -I libft -c $(CFLAGS) -o $@ $<
 
-$(LIBFT):
+$(LIBFT):	libft
 			@$(MAKE) f --no-print-directory -C libft
 			@/bin/mv -f libft/$(LIBFT) .
+
+libft:
+			@git clone https://github.com/airseneo/libft.git libft
 
 $(BIN)/%:	%.o $(LIBFT)
 				$(CC) -I libft $(CFLAGS) -o $@ $^
@@ -67,7 +69,7 @@ clean:
 			/bin/rm -f $(OBJS) $(OBJS_BIN)
 
 fclean:		clean
-			/bin/rm -f $(NAME) $(LIBFT) $(BIN)/*
+			/bin/rm -rf $(NAME) $(LIBFT) $(BIN) libft
 
 re:			fclean all
 

@@ -35,7 +35,7 @@
 # define WHT		"\x1B[37m"
 # define RESET		"\x1B[0m"
 # define PATH_MAX	4096
-# define PATH_ENV	"PATH=/home/user42/mini/bin"
+# define PATH_ENV	"PATH=_BIN_PATH_"
 
 # define DOLLARSIG	1
 # define QUOTATION	3
