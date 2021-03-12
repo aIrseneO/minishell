@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 04:33:32 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/22 23:11:04 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/08 21:25:05 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void		prompt(int mode)
 
 void		prompt2(void)
 {
+	signal(SIGINT, sigquit_ctrl_slash_handler);
 	write(STDERR_FILENO, "\x1B[34m> \x1B[0m", 11);
 }
 

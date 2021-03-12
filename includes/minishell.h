@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/14 20:47:42 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/23 00:02:10 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/12 00:10:40 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,13 @@
 # define BACKSLASH	8
 # define OLDQUOTES	2
 # define NONDOLLAR	4
+
+/*
+** In case of failure of any type, the Father process will
+** exit properly with the value X below
+*/
+
+# define X			-42
 
 /*
 **	For debugging
@@ -96,7 +103,7 @@ typedef struct	s_data
 	int			status;
 }				t_data;
 
-int				sh_get_line(t_data *data, int n);
+t_data			*dataptr;
 
 void			prompt(int mode);
 void			prompt2(void);
@@ -104,7 +111,6 @@ int				sh_isbackslash(char c);
 int				sh_isquotation(char c);
 void			sh_putstr_fd(char *s, int fd);
 int				sh_is_back_escape(char *line, int i);
-void			sh_get_command_line(t_data *data, int n);
 int				sh_save_std_fileno(int std_fileno[3]);
 int				sh_restore_std_fileno(int std_fileno[3]);
 
@@ -114,10 +120,12 @@ void			sh_free_data_exit1(t_data *data, char *s1, char *s2, int exno);
 void			sh_free_data_exit2(t_data *data, char *s1, char *s2, int exno);
 int				sh_perror_return(char *s1, char *s2, char *s3, int n);
 
+int				sh_execve(t_data *data, int i);
+void			sh_check_and_update_path(t_data *data, int i, char *app);
+void			sh_handle_execve_error(t_data *data, int i, char *app);
 void			sh_execute_pipes(t_data *data, int fd, int i);
 void			sh_recursive_redirection(t_data *data, int i,
 					int (*exc)(t_data*, int));
-int				sh_execve(t_data *data, int i);
 
 int				sh_run_if_non_binary(t_data *data, int i);
 void			sh_execute_if_non_binary(t_data *data, int i);
@@ -133,7 +141,6 @@ void			sig_handler1(int signum);
 void			sig_handler2(int signum);
 void			sigint_ctrl_c_handler(int signum);
 void			sigquit_ctrl_slash_handler(int signum);
-void			sigquit_ctrl_slash_handler2(int signum);
 void			sigexit_ctrl_d_handler(t_data *data, int exno);
 void			sigappend_ctrl_d_handler(t_data *data, char **line, int n);
 
@@ -149,7 +156,6 @@ int				sh_extract_file(t_data *data, char *line2, int *i,
 					t_list **list);
 int				sh_extract_args(t_data *data, char *line2, int *i,
 					t_list **list);
-int				sh_make_absolute_path(char **app, t_data *data);
 char			*sh_recursive_replace_dollar_clean(char *line, int i,
 					t_data *data);
 
@@ -158,7 +164,6 @@ int				sh_bad_syntax(char *s, char c);
 int				sh_recursive_check(t_data *data, char **line, int i);
 int				sh_check_semicolon(t_data *data, char **line, int i);
 int				sh_check_quotation(t_data *data, char **line, int i, char c);
-int				sh_check_redirection(t_data *data, char **line, int i);
 char			*sh_fix_quotations(char *line, char *newline, int ij[2]);
 void			sh_fill_postquote(char *line, char *newline, int ij[2]);
 void			sh_memcpy(char *dest, char *src, int n);

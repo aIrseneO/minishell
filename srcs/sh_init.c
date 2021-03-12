@@ -77,7 +77,7 @@ static void	sh_zerodata_and_init_const(t_data *data, int ac, char **av)
 	data->fd = STDIN_FILENO;
 	data->mode = 0;
 	if (sh_save_std_fileno(data->std_fileno) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	data->pwd = NULL;
 	data->pwd_env = NULL;
 	data->ispwd_env = 1;
@@ -99,18 +99,18 @@ void		sh_init(t_data *data, int ac, char **av, char **env)
 {
 	sh_zerodata_and_init_const(data, ac, av);
 	if (data->envpl == NULL)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	*data->envpl = NULL;
 	sh_get_fd_or_line(data);
 	if (data->fd == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	data->envp = ft_astrdup(env);
 	if (!(*env) && data->envp == NULL)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	if (ft_astrtolst(data->envpl, data->envp) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	data->pwd = ft_getcwd();
 	if (data->pwd == NULL)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	sh_update_envp(data, 0);
 }

@@ -6,7 +6,7 @@
 #*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        *#
 #*                                                +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/30 15:21:51 by atemfack          #+#    #+#             *#
-#*   Updated: 2021/02/23 00:05:54 by atemfack         ###   ########.fr       *#
+#*   Updated: 2021/03/11 05:59:04 by atemfack         ###   ########.fr       *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
@@ -17,10 +17,10 @@ SRCS = main.c sh_error_free_exit.c \
 	sh_signal_handler.c sh_signal_handler_utils.c \
 	sh_init.c sh_init_utils.c \
 	sh_parse_input.c sh_parse_input_utils1.c sh_parse_input_utils2.c \
-	sh_parse_input_utils3.c sh_parse_input_utils4.c \
+	sh_parse_input_utils3.c \
 	sh_syntax_check.c sh_syntax_check_utils1.c sh_syntax_check_utils2.c \
 	sh_syntax_check_utils3.c sh_syntax_check_utils4.c \
-	sh_execute.c sh_execute_utils.c \
+	sh_execute.c sh_execute_utils1.c sh_execute_utils2.c \
 	sh_run.c sh_cd.c sh_unset.c sh_exit.c sh_pwd.c \
 	sh_export.c sh_export_utils.c
 
@@ -32,7 +32,7 @@ OBJS_BIN	= $(subst .c,.o,$(SRCS_BIN))
 BIN			= bin
 BIN_PATH	= $(PWD)/$(BIN)
 
-CFLAGS		= -Wall -Wextra -Werror #-g -fsanitize=address
+CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
 
 LIBFT		= libft.a
 

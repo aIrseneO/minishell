@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/27 23:07:07 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/13 04:32:31 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/11 04:26:31 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ static int	sh_load_app(t_data *data, char **app, int isquote)
 		return (-1);
 	if (**app == '\0' && !isquote)
 		ft_strdel(app);
-	else if (sh_make_absolute_path(app, data) == -1)
-		return (-1);
+	//else if (sh_make_absolute_path(app, data) == -1)
+	//	return (-1);
 	return (0);
 }
 
@@ -79,16 +79,16 @@ int			sh_recursive_parse_line2(t_data *data, char *line2,
 	if (ft_isredirection(line2[i]) && !(sh_is_back_escape(line2, i - 1)))
 	{
 		if (sh_extract_redirections(line2, &i, &cmd->redirections) == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		if (sh_extract_file(data, line2, &i, &cmd->files))
 			return (1);
 	}
 	else if (cmd->app)
 	{
 		if (sh_extract_args(data, line2, &i, &cmd->args) == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 	}
 	else if (sh_extract_app(data, line2, &i, &cmd->app) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	return (sh_recursive_parse_line2(data, line2, i, cmd));
 }

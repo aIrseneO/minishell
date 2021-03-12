@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:42:48 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/23 04:15:53 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/11 23:43:57 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void		sigint_ctrl_c_handler(int signum)
 {
 	write(STDERR_FILENO, "\n", 1);
+	dataptr->status = 130;
 	prompt(0);
 	(void)signum;
 }
@@ -34,7 +35,7 @@ void		sigexit_ctrl_d_handler(t_data *data, int exno)
 }
 
 /*
-** When ctrl+d is catch, this function append new input to old one.
+** When ctrl+d is catch, this function appends new input to old one.
 */
 
 void		sigappend_ctrl_d_handler(t_data *data, char **line, int n)
@@ -49,13 +50,13 @@ void		sigappend_ctrl_d_handler(t_data *data, char **line, int n)
 		if (n == -1)
 		{
 			free(tmp1);
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		}
 		tmp2 = *line;
 		*line = ft_strjoin(tmp1, *line);
 		free(tmp1);
 		free(tmp2);
 		if (*line == NULL)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 	}
 }

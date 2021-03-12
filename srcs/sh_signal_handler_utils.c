@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 18:42:48 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/23 04:15:53 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/11 23:43:59 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 void		sig_handler1(int signum)
 {
-	write(STDERR_FILENO, "\n", 1);
 	(void)signum;
 }
 
 void		sig_handler2(int signum)
 {
+	write(STDERR_FILENO, "\n", 1);
 	(void)signum;
 }

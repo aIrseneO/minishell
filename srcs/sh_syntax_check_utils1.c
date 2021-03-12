@@ -6,7 +6,7 @@
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 21:21:55 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/23 00:03:23 by atemfack         ###   ########.fr       */
+/*   Updated: 2021/03/10 23:21:24 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	sh_get_line_to_append_pipe(t_data *data, char **line, int n)
 		prompt2();
 		n = get_next_line(data->fd, line);
 		if (n == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		else if (n == 0)
 		{
 			if (!(**line))
@@ -77,14 +77,27 @@ static int	sh_check_escape(t_data *data, char **line, int i, int n)
 		(*line)[--i] = '\0';
 		prompt2();
 		if (get_next_line(data->fd, &newline) == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		tmp = ft_strjoin(*line, newline);
 		free(newline);
 		if (!tmp)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		free(*line);
 		*line = tmp;
 	}
+	return (sh_recursive_check(data, line, i));
+}
+
+static int	sh_check_redirection(t_data *data, char **line, int i)
+{
+	if (ft_isredirection((*line)[i + 1])
+		&& !ft_strncmp(*line + i++, "><", 2))
+		return (sh_bad_syntax("<", 0));
+	i += ft_isfx_ptrmove(*line + i + 1, ft_isspace, NULL) - (*line + i);
+	if (!(*line)[i])
+		return (sh_bad_syntax("newline", 0));
+	if (ft_strchr("|;><", (*line)[i]))
+		return (sh_bad_syntax(NULL, (*line)[i]));
 	return (sh_recursive_check(data, line, i));
 }
 

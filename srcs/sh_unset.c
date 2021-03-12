@@ -85,7 +85,7 @@ int			sh_unset(t_data *data, int i)
 		return (n);
 	argv = ft_lsttoastr(*data->envpl);
 	if (argv == NULL && *data->envpl)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	free(data->envp);
 	data->envp = argv;
 	return (n);

@@ -18,7 +18,7 @@ void	sh_get_command_line(t_data *data, int n)
 	{
 		n = get_next_line(data->fd, &data->line);
 		if (n == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		if (n == 0)
 		{
 			if (!(*data->line))

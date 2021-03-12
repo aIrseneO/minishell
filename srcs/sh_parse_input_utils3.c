@@ -5,66 +5,115 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: atemfack <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/09 23:49:51 by atemfack          #+#    #+#             */
-/*   Updated: 2021/02/10 13:38:34 by atemfack         ###   ########.fr       */
+/*   Created: 2021/01/27 18:05:04 by atemfack          #+#    #+#             */
+/*   Updated: 2021/03/11 05:58:27 by atemfack         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char			*sh_get_absolute_path(char *app, t_data *data, int j)
+static char	*sh_clean(char *str)
 {
-	DIR				*directory;
-	struct dirent	*dir;
+	int		i;
+	int		j;
 
-	while (data->path[j])
+	i = 0;
+	j = 0;
+	while (str[j])
 	{
-		directory = opendir(data->path[j]);
-		if (directory)
-		{
-			while (1)
-			{
-				dir = readdir(directory);
-				if (dir == NULL)
-					break ;
-				if (!ft_strcmp(dir->d_name, app))
-				{
-					closedir(directory);
-					return (ft_strjoin2(data->path[j], "/", app));
-				}
-			}
-			closedir(directory);
-		}
-		j++;
+		if (str[j] == QUOTATION || str[j] == BACKSLASH
+			|| str[j] == OLDQUOTES || str[j] == NONDOLLAR)
+			j++;
+		else if (str[j] == DOLLARSIG && ++j)
+			str[i++] = '$';
+		else
+			str[i++] = str[j++];
 	}
-	return (app);
+	str[i] = '\0';
+	return (str);
 }
 
-static int			sh_is_builtin(char *app)
+static char	*sh_replace(char *line, int *i, char *strmid, char *end)
 {
-	if (!ft_strcmp(app, "cd") || !ft_strcmp(app, "export")
-		|| !ft_strcmp(app, "unset") || !ft_strcmp(app, "pwd")
-		|| !ft_strcmp(app, "exit"))
-		return (1);
-	return (0);
+	char	*tmp;
+
+	if (strmid == NULL)
+		return (NULL);
+	line[*i - 1] = '\0';
+	tmp = ft_strjoin2(line, strmid, end);
+	*i += ft_strlen(strmid) - 1;
+	free(strmid);
+	if (tmp == NULL)
+		return (NULL);
+	return (tmp);
 }
 
-int					sh_make_absolute_path(char **app, t_data *data)
+static char	*sh_replace_envp_value(char *line, int *i, char **envp)
 {
-	char			*path;
+	int		n;
+	char	*tmp;
 
-	if (!data->path)
-		return (0);
-	if (**app == '.' || **app == '/')
-		return (0);
-	if (sh_is_builtin(*app))
-		return (0);
-	path = sh_get_absolute_path(*app, data, 0);
-	if (path == NULL)
-		return (-1);
-	if (path == *app)
-		return (0);
-	free(*app);
-	*app = path;
-	return (0);
+	n = 0;
+	tmp = line + *i;
+	while (tmp[n] && (ft_isalpha(tmp[n])
+			|| tmp[n] == '_' || ft_isdigit(tmp[n])))
+		n++;
+	while (*envp)
+	{
+		if (!strncmp(tmp, *envp, n) && (*envp)[n] == '=')
+			break ;
+		envp++;
+	}
+	if (*envp == NULL)
+		return (sh_replace(line, i, ft_strdup(""), tmp + n));
+	return (sh_replace(line, i, ft_strdup(*envp + n + 1), tmp + n));
+}
+
+static char	*sh_replace_element(char *line, int *i, char c, t_data *data)
+{
+	int		digit;
+
+	if (c == '#')
+		return (sh_replace(line, i, ft_itoa(data->ac), line + *i + 1));
+	if (c == '$')
+		return (sh_replace(line, i, ft_itoa(data->shellpid), line + *i + 1));
+	if (c == '?')
+		return (sh_replace(line, i, ft_itoa(data->status), line + *i + 1));
+	if (c == '_')
+	{
+		digit = 0;
+		while (data->envp[digit] && ft_strncmp(data->envp[digit], "_=", 2))
+			digit++;
+		if (!data->envp[digit])
+			return (sh_replace(line, i, ft_strdup("_"), line + *i + 1));
+		else
+			return (sh_replace_envp_value(line, i, data->envp));
+	}
+	digit = c - '0';
+	if (digit < data->ac)
+		return (sh_replace(line, i, ft_strdup(data->av[digit]), line + *i + 1));
+	return (sh_replace(line, i, ft_strdup(""), line + *i + 1));
+}
+
+char		*sh_recursive_replace_dollar_clean(char *line, int i, t_data *data)
+{
+	char	*new;
+
+	while (line[i] && line[i] != '$')
+		i++;
+	if (line[i] == '\0')
+		return (sh_clean(line));
+	if (line[i] == '$' && (line[i + 1] == '=' || sh_isquotation(line[i + 1])
+			|| sh_isbackslash(line[i + 1]) || sh_is_back_escape(line, i - 1)))
+		return (sh_recursive_replace_dollar_clean(line, i + 1, data));
+	if (line[++i] == '\0')
+		return (sh_clean(line));
+	else if (ft_isdigit(line[i]) || ft_strchr("#$?_", line[i]))
+		new = sh_replace_element(line, &i, line[i], data);
+	else
+		new = sh_replace_envp_value(line, &i, data->envp);
+	if (new == NULL)
+		return (NULL);
+	ft_strdel(&line);
+	return (sh_recursive_replace_dollar_clean(new, i, data));
 }

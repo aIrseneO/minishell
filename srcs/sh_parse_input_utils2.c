@@ -19,13 +19,13 @@ static int	sh_add_back1(t_data *data, t_list **list, t_list *new, int isquote)
 	if (new)
 		tmp = ft_strdup(new->content);
 	if (new == NULL || tmp == NULL)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	new->content = sh_recursive_replace_dollar_clean(new->content, 0, data);
 	if (new->content == NULL)
 	{
 		free(tmp);
 		ft_lstclear(&new, NULL);
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	}
 	if (((char *)new->content)[0] == '\0' && !isquote)
 	{

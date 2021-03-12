@@ -80,5 +80,5 @@ void		sh_update_envp(t_data *data, int i)
 		i++;
 	}
 	if (sh_update(data, is_env) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 }

@@ -22,7 +22,7 @@ static void	sh_run(t_data *data, int (*run)(t_data*, int))
 	data->cmd[0]->redirections = save_redirections_files[0];
 	data->cmd[0]->files = save_redirections_files[1];
 	if (sh_restore_std_fileno(data->std_fileno) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 }
 
 int			sh_run_if_non_binary(t_data *data, int n)

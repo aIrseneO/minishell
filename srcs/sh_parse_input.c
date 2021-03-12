@@ -72,21 +72,21 @@ int			sh_parse_cmds(t_data *data, int i)
 	data->line2 = ft_split3(data->line1[i], '|',
 					sh_isquotation, sh_isbackslash);
 	if (data->line2 == NULL)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	if (sh_init_cmd(&data->cmd, ft_astrsize(data->line2)) == -1)
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	j = 0;
 	while (data->line2[j])
 	{
 		if (sh_recursive_parse_line2(data, data->line2[j], 0, data->cmd[j]))
 			return (1);
 		if (sh_load_argv(&data->cmd[j]->argv, data->cmd[j]->args) == -1)
-			sh_free_data_exit1(data, NULL, strerror(errno), -1);
+			sh_free_data_exit1(data, NULL, strerror(errno), X);
 		j++;
 	}
 	data->ispiped = j - 1;
 	data->children_pid = (pid_t *)malloc(sizeof(pid_t) * j);
 	if (data->children_pid == NULL || (j == 1 && sh_update_envp_(data) == -1))
-		sh_free_data_exit1(data, NULL, strerror(errno), -1);
+		sh_free_data_exit1(data, NULL, strerror(errno), X);
 	return (0);
 }
