@@ -2,7 +2,7 @@
 In this project I create a simple shell. A command parser is implemented as the project restrictions require. Redirection, Pipes and some signals are implemented as well, see [project initial restrictions](https://drive.google.com/file/d/1HNAZDhHzQ4zPMkp8eE4SVfP4wlUWlWLZ/view?usp=sharing).
 ## How to run it?
 [GCC](https://gcc.gnu.org/ "gcc web page") is used to compile see **Makefile**.<br>
-To get set the absolute path for new binaries run
+To set the absolute path for new binaries run
 ```bash
 make path
 ```
@@ -12,6 +12,7 @@ This can be reverse with
 make nopath
 ```
 <br>
+
 To create the executable and binaries run
 ```bash
 make
