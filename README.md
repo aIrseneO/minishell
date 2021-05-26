@@ -1,5 +1,5 @@
 # minishell
-In this project I create a minimalistic bash like shell. A command parser is fully implemented as the project restrictions require, see [project inital restrictions](). Redirection, Pipes and some signals are implemented as well.
+In this project I create a simple shell. A command parser is implemented as the project restrictions require. Redirection, Pipes and some signals are implemented as well, see [project initial restrictions](https://drive.google.com/file/d/1HNAZDhHzQ4zPMkp8eE4SVfP4wlUWlWLZ/view?usp=sharing).
 ## How to run it?
 [GCC](https://gcc.gnu.org/ "gcc web page") is used to compile see **Makefile**.<br>
 To get set the absolute path for new binaries run
@@ -9,9 +9,9 @@ make path
 this will update the absolute path in the header file to the current directory.<br>
 This can be reverse with
 ```bash
-mane nopath
+make nopath
 ```
-
+<br>
 To create the executable and binaries run
 ```bash
 make
