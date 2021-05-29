@@ -37,3 +37,8 @@ To make the library and clean object files at once run
 ```bash
 make f
 ```
+## Known bug (I dare you to fix it)
+```
+cd < a
+```
+This command should not exit the shell as in bash
