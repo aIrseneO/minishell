@@ -1,8 +1,8 @@
-/*
-* Copyright (c) 2020 Arsene Temfack
-*
-* SPDX-License-Identifier: MIT
-*/
+/******************************************************************************/
+/*     Copyright (c) 2020 Arsene Temfack                                      */
+/*                                                                            */
+/*     SPDX-License-Identifier: MIT                                           */
+/******************************************************************************/
 
 #ifndef MINISHELL_H
 # define MINISHELL_H

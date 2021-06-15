@@ -1,8 +1,8 @@
-/*
-* Copyright (c) 2020 Arsene Temfack
-*
-* SPDX-License-Identifier: MIT
-*/
+/******************************************************************************/
+/*     Copyright (c) 2020 Arsene Temfack                                      */
+/*                                                                            */
+/*     SPDX-License-Identifier: MIT                                           */
+/******************************************************************************/
 
 /*
 ** gw echo.c libft.a -o bin/echo

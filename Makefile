@@ -1,8 +1,8 @@
-# Copyright (c) 2020 Arsene Temfack
-#
-# SPDX-License-Identifier: MIT
-
-NAME = minishell
+################################################################################
+#     Copyright (c) 2020 Arsene Temfack                                        #
+#                                                                              #
+#     SPDX-License-Identifier: MIT                                             #
+################################################################################
 
 SRCS = main.c sh_error_free_exit.c \
 	sh_utils1.c sh_utils2.c \
