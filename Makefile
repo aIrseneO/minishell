@@ -4,6 +4,8 @@
 #     SPDX-License-Identifier: MIT                                             #
 ################################################################################
 
+NAME = minishell
+
 SRCS = main.c sh_error_free_exit.c \
 	sh_utils1.c sh_utils2.c \
 	sh_signal_handler.c sh_signal_handler_utils.c \
