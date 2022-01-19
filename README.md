@@ -1,21 +1,11 @@
 # minishell
-In this project I create a simple shell. A command parser is implemented as the project restrictions require. Redirection, Pipes and some signals are implemented as well, see [project initial restrictions](https://drive.google.com/file/d/1HNAZDhHzQ4zPMkp8eE4SVfP4wlUWlWLZ/view?usp=sharing).
+This project is to create a simple shell. None of the [exec](https://man7.org/linux/man-pages/man3/exec.3.html) family functions is used. Input parser, redirection, pipes and some signals are implemented from scratch.
 ## How to run it?
 [GCC](https://gcc.gnu.org/ "gcc web page") is used to compile see **Makefile**.<br>
-To set the absolute path for new binaries run
-```bash
-make path
-```
-this will update the absolute path in the header file to the current directory.<br>
-This can be reverse with
-```bash
-make nopath
-```
-<br>
 
 To create the executable and binaries run
 ```bash
-make
+make [minishell]
 ```
 To launch the minishell run
 ```bash
@@ -37,7 +27,7 @@ To make the library and clean object files at once run
 ```bash
 make f
 ```
-## Known bug (I dare you to fix it)
+## Known bug
 ```
 cd < a
 ```

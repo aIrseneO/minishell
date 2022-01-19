@@ -21,15 +21,12 @@ SRCS = main.c sh_error_free_exit.c \
 OBJS		= $(subst .c,.o,$(SRCS))
 HEADER		= includes/minishell.h
 
-SRCS_BIN	= echo.c env.c pwd.c
-OBJS_BIN	= $(subst .c,.o,$(SRCS_BIN))
-BIN			= bin
-BIN_PATH	= $(PWD)/$(BIN)
 CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
+BINDIR		= $(DESTDIR)/usr/bin
 
 LIBFT		= libft.a
 
-all:		libft path $(NAME) bin_dir bin
+all:		libft $(NAME)
 
 $(NAME):	$(OBJS)	$(LIBFT)
 			$(CC) $(CFLAGS) -o $@ $^
@@ -44,20 +41,9 @@ $(LIBFT):
 libft:
 			@git clone https://github.com/airseneo/libft.git libft
 
-$(BIN)/%:	%.o $(LIBFT)
-				$(CC) -I libft $(CFLAGS) -o $@ $^
-
-bin:		bin_dir $(BIN)/echo $(BIN)/env $(BIN)/pwd
-
-path:
-			@bash -c "if grep _BIN_PATH_ $(HEADER); \
-			then /bin/sed -i \"s|_BIN_PATH_|$(BIN_PATH)|g\" $(HEADER); fi"
-
-nopath:
-			/bin/sed -i "s|PATH=.*|PATH=_BIN_PATH_\"|g" $(HEADER)
-
-bin_dir:
-			@bash -c "if [ ! -d ./bin ]; then mkdir bin; fi"
+install:	$(NAME)
+			install -d $(BINDIR)
+			install $(TARGET) $(BINDIR)
 
 clean:
 			/bin/rm -f $(OBJS) $(OBJS_BIN)
@@ -69,4 +55,4 @@ re:			fclean all
 
 f:			all clean
 
-.PHONY:		all clean fclean re f
+.PHONY:		all libft  install clean fclean re f
