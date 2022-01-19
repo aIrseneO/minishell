@@ -43,7 +43,7 @@ libft:
 
 install:	$(NAME)
 			install -d $(BINDIR)
-			install $(TARGET) $(BINDIR)
+			install $(NAME) $(BINDIR)
 
 clean:
 			/bin/rm -f $(OBJS) $(OBJS_BIN)
