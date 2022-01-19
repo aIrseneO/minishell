@@ -22,6 +22,7 @@ OBJS		= $(subst .c,.o,$(SRCS))
 HEADER		= includes/minishell.h
 
 CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
+
 BINDIR		= $(DESTDIR)/usr/bin
 
 LIBFT		= libft.a
@@ -41,7 +42,7 @@ $(LIBFT):
 libft:
 			@git clone https://github.com/airseneo/libft.git libft
 
-install:	$(NAME)
+install:	libft $(NAME)
 			install -d $(BINDIR)
 			install $(NAME) $(BINDIR)
 
