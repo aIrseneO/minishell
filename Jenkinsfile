@@ -20,5 +20,13 @@ pipeline {
         }
       }
     }
+    stage('Test') {
+      steps {
+        container('cbuilder') {
+          sh 'make test'
+        }
+      }
+    }
+
   }
 }
