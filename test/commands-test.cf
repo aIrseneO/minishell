@@ -234,7 +234,7 @@ exit exit
 # Test Export
 export | grep "SHLVL"
 export | grep "OLDPWD"
-export | grep "PWD"
+#export | grep "PWD"
 export $? 
 export TEST
 export TEST=

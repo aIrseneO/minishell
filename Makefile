@@ -40,17 +40,22 @@ $(LIBFT):
 			@/bin/mv -f libft/$(LIBFT) .
 
 libft:
-			@git clone https://github.com/airseneo/libft.git libft
+			@if [ ! -d libft ]; then \
+				git clone https://github.com/airseneo/libft.git libft; \
+			fi
 
 install:	libft $(NAME)
 			install -d $(BINDIR)
 			install $(NAME) $(BINDIR)
 
+test:		install
+			@bash test/run-test.sh bash minishell ./test
+
 clean:
 			/bin/rm -f $(OBJS) $(OBJS_BIN)
 
 fclean:		clean
-			/bin/rm -rf $(NAME) $(LIBFT) $(BIN) libft
+			/bin/rm -rf $(NAME) $(LIBFT) $(BIN) libft test/result-test.cf
 
 re:			fclean all
 

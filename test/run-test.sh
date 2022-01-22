@@ -10,8 +10,8 @@ MSG="Run a serie of shell commands on two binaries and compare the output.\n
    Check this script for configurations.\n
    Commands are stored in all files '*.cf'\n
    in the same directory as the script.\n\n
-\tUsage: $0 [ --help | -h | help ] [common-shell personnilize-shell]\n
-\t\t e.g.: $0 bash minishell"
+\tUsage: $0 [ --help | -h | help ] [common-shell personnilize-shell workdir]\n
+\t\t e.g.: $0 bash minishell /minishell/test"
 
 if [[ "$#" = "1" ]] &&
 		[[ "$1" = "--help" || "$1" = "-h" || "$1" = "help" ]]; then
@@ -20,9 +20,11 @@ fi
 
 SHELL=$1
 MY_SHELL=$2
+WORKDIR=$3
 
-if [[ "$#" != "2" ]] || \
-	   [[ ! -f $(which $SHELL) ]] || [[ ! -f $(which $MY_SHELL) ]]; then
+if [[ "$#" != "3" ]] || \
+	   [[ ! -f $(which $SHELL) ]] || [[ ! -f $(which $MY_SHELL) ]] || \
+	   [[ ! -d $WORKDIR ]]; then
 	echo -e $MSG; exit 1
 fi
 
@@ -31,14 +33,17 @@ fi
 VALGRIND=			#off
 #VALGRIND=valgrind	#on
 
-# Result test file, it only includes failed tests,
-# it will be deleted every time the script is successfully run.
-RESULT_TEST=result-test.cf
-
 # Get numerated tests, not used just a useful command for troubleshouting.
-##grep -n -v -e "^#" "^$" $FILE
+##grep -n -v -e "^#" -e "^$" $FILE
 
 ################################################################################
+
+# Result test file, it only includes failed tests,
+# it will be deleted every time the script is successfully run.
+RESULT_TEST=$WORKDIR/result-test.cf
+
+# Get all the test files
+FILES=$(ls $WORKDIR/*.cf | grep -v $RESULT_TEST)
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -46,10 +51,6 @@ YELLOW='\033[0;33m'
 
 CHECK="\u2713"
 CROSS="\u2717"
-
-
-# Get all the test files
-FILES=$(ls ./*.cf | grep -v $RESULT_TEST)
 
 # Remove the result file
 rm $RESULT_TEST
