@@ -15,7 +15,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        container('cbuild') {
+        container('cbuilder') {
           sh 'make install'
         }
       }
