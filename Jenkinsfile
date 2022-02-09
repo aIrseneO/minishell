@@ -27,6 +27,15 @@ pipeline {
         }
       }
     }
+  }
+  post {
+    success {
+      slackSend(channel: 'jenkinsci', message: "Pipeline succeeded - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+    }
+
+    failure {
+      slackSend(channel: 'jenkinsci', message: "Pipeline failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+    }
 
   }
 }
