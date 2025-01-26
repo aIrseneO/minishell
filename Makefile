@@ -27,6 +27,8 @@ BINDIR		= $(DESTDIR)/usr/bin
 
 LIBFT		= libft.a
 
+CURRENT_DIR = $(subst /Makefile,,$(abspath $(lastword $(MAKEFILE_LIST))))
+
 all:		libft $(NAME)
 
 $(NAME):	$(OBJS)	$(LIBFT)
@@ -47,6 +49,12 @@ libft:
 install:	libft $(NAME)
 			install -d $(BINDIR)
 			install $(NAME) $(BINDIR)
+
+docker:		libft
+			@docker build -t cbuilder .
+			@docker run -it --rm -v $(CURRENT_DIR):/app cbuilder bash -c "make  -C /app minishell"
+			@docker run -it --rm -v $(CURRENT_DIR):/app cbuilder bash -c "make  -C /app clean"
+			@docker run -it --rm -v $(CURRENT_DIR):/app cbuilder /app/minishell
 
 test:		install
 			@bash test/run-test.sh bash minishell ./test
